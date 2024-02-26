@@ -1,5 +1,3 @@
-#pragma once
-
 /* **************************************************************************** */
 /*                                                                              */
 /*                                                       ::::::::  :::   :::    */
@@ -7,61 +5,44 @@
 /*                                                    +:+         +:+ +:+       */
 /*   By: Durandnico <durandnico@cy-tech.fr>          +#+          +#++:         */
 /*                                                 +#+           +#+            */
-/*   Created: 23/February/2024 by Durandnico      #+#    #+#    #+#             */
+/*   Created: 26/February/2024 by Durandnico   	  #+#    #+#    #+#             */
 /*                                                ########     ###              */
 /*                                                                              */
 /* **************************************************************************** */
 
 /*! 
- *  \file Dense.hxx
+ *  \file SGD.cxx
  *  \author DURAND Nicolas Erich Pierre <durandnico@cy-tech.fr>
  *  \version 0.1
- *  \date Fri 23 February 2024 - 15:57:47
+ *  \date Mon 26 February 2024 - 17:20:12
  *
  *  \brief 
- *    file containing the definition of the Dense class 
+ *
  *
  */
 
 // Inclusion des entetes de librairies
-#include <Eigen/Dense>
 #include "Optimizer.hxx"
-#include "global.hxx"
-
-
-using namespace Eigen;
+#include "Dense.hxx"
+#include <Eigen/Dense>
+#include <iostream>
 
 namespace NeuralNetwork
 {
+  SGD::SGD(double _learning_rate)
+    : learning_rate{_learning_rate}
+  {
+  }
 
-class Optimizer;
+  SGD::~SGD()
+  {
+  }
 
-class Dense
-{
-protected:
-  /* data */
-  MatrixXd weights;
-  MatrixXd biases;
-  MatrixXd inputs;
-  Optimizer* optimizer;
-
-  int n_inputs;
-  int n_outputs;  
-
-public:
-  Dense();
-  Dense(const int _N_INPUTS, const int _N_OUTPUTS, Optimizer*);
-  ~Dense();
-
-  virtual VectorXd forward(const MatrixXd& inputs);
-  virtual VectorXd backward(const MatrixXd& output_grad);
-
-  inline MatrixXd& get_inputs() { return inputs; } 
-  inline MatrixXd& get_weights() { return weights; }
-  inline MatrixXd& get_biases() { return biases; }
-
-  inline void set_weights(const MatrixXd& _weights) { weights = _weights; }
-  inline void set_biases(const MatrixXd& _biases) { biases = _biases; }
-};
-
+  void SGD::update(NeuralNetwork::Dense* layer, const MatrixXd& output_grad)
+  {
+    MatrixXd weights_grad = output_grad * layer->get_inputs().transpose();
+   
+    layer->set_weights(layer->get_weights() - learning_rate * weights_grad);
+    layer->set_biases(layer->get_biases() - learning_rate * output_grad);
+  }
 }

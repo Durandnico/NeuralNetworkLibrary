@@ -26,6 +26,7 @@
 #include "Activation.hxx"
 #include "global.hxx"
 #include "Dense.hxx"
+#include "Optimizer.hxx"
 #include <Eigen/Dense>
 #include <iostream>
 
@@ -52,8 +53,7 @@ VectorXd NeuralNetwork::Activation::forward(const MatrixXd& inputs)
   return inputs.unaryExpr(activation);
 }
 
-VectorXd NeuralNetwork::Activation::backward(const MatrixXd& output_grad, const double learning_rate)
+VectorXd NeuralNetwork::Activation::backward(const MatrixXd& output_grad)
 {
-  (void)learning_rate;
   return output_grad.cwiseProduct(inputs.unaryExpr(activation_prime));
 }

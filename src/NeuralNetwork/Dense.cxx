@@ -23,31 +23,32 @@
 
 // Inclusion des entetes de librairies
 #include "Dense.hxx"
+#include "Optimizer.hxx"
 #include "global.hxx"
 #include <Eigen/Dense>
 #include <iostream>
 
 using namespace Eigen;
 
-NeuralNetwork::Dense::Dense(const int n_inputs, const int n_outputs)
+NeuralNetwork::Dense::Dense(const int n_inputs, const int n_outputs, Optimizer* optimizer)
   : weights{MatrixXd::Random(n_outputs, n_inputs)},
     biases{VectorXd::Random(n_outputs)},
+    optimizer{optimizer},
     n_inputs{n_inputs},
     n_outputs{n_outputs}
 {
-
+  
 }
 
 NeuralNetwork::Dense::Dense()
 {
-
 }
 
 
 
 NeuralNetwork::Dense::~Dense()
 {
-
+  delete optimizer;
 }
 
 
@@ -61,15 +62,11 @@ VectorXd NeuralNetwork::Dense::forward(const MatrixXd& inputs)
 }
 
 
-VectorXd NeuralNetwork::Dense::backward(const MatrixXd& output_grad, const double learning_rate)
+VectorXd NeuralNetwork::Dense::backward(const MatrixXd& output_grad)
 {
   ASSERT(output_grad.size() == n_outputs);
 
-  const MatrixXd weights_grad = output_grad * inputs.transpose();
-  this->weights -= learning_rate * weights_grad;
-  this->biases  -= learning_rate * output_grad;
- 
+  optimizer->update(this, output_grad);
   return weights.transpose() * output_grad;
 }
-
 
