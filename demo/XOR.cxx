@@ -9,9 +9,11 @@
 #include "Sigmoid.hxx"
 #include "Tanh.hxx"
 #include "Relu.hxx"
+#include "LeakyRelu.hxx"
+#include "Optimizer.hxx"
 
-constexpr double learning_rate = 0.1;
-constexpr int epochs = 1000;
+constexpr double learning_rate = 0.01;
+constexpr int epochs = 5000;
 constexpr double alpha = 0.01;
 
 int main()
@@ -21,15 +23,14 @@ int main()
 
    /* creating neural network for XOR */
   NeuralNetwork::Dense* NN[] = {
-    new NeuralNetwork::Dense(2, 3),
-    new NeuralNetwork::Tanh{},
+    new NeuralNetwork::Dense(2, 3, new NeuralNetwork::Adam{}),
+    // new NeuralNetwork::Tanh{},
     // new NeuralNetwork::Relu{},
-    // new NeuralNetwork::LeakyRelu{alpha},
-    new NeuralNetwork::Dense(3, 1),
+    new NeuralNetwork::LeakyRelu{alpha},
+    new NeuralNetwork::Dense(3, 1, new NeuralNetwork::Adam{}),
     new NeuralNetwork::Sigmoid{}
   };
 
-  ASSERT(0);
 
   /* training data */
   Eigen::MatrixXd X(4, 2);
@@ -64,10 +65,13 @@ int main()
 
       /* backward */
       Eigen::VectorXd grad = NeuralNetwork::mean_squared_error_prime(target, inputs);
+      // NeuralNetwork::Adam{learning_rate, 0.9, 0.999, 1e-8};
+      // NeuralNetwork::SGD optimizer(learning_rate);
+
       /* loop from last to first*/
       for(int i = 3; i >= 0; i--)
       {
-        grad = NN[i]->backward(grad, learning_rate);
+        grad = NN[i]->backward(grad);
       }
     }
 
@@ -96,10 +100,11 @@ int main()
 
     printf("target: %f, prediction: %f\n", target(0), inputs(0));
   }
-  
-  for (auto layer : NN)
+
+  for (NeuralNetwork::Dense* layer : NN)
   {
     delete layer;
-  }
+  }  
+
   return 0;
 }
