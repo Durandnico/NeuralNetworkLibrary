@@ -2,3 +2,9 @@ obj
 bin
 doc
 *.log
+
+# external lib
+eigen*
+
+# IDE config
+.vscode
