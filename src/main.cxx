@@ -12,6 +12,9 @@
 #include "LeakyRelu.hxx"
 #include "Optimizer.hxx"
 
+#include "NeuralNetwork.hxx"
+#include "NeuralNetworkBuilder.hxx"
+
 constexpr double learning_rate = 0.01;
 constexpr int epochs = 5000;
 constexpr double alpha = 0.01;
@@ -21,15 +24,12 @@ int main()
 
   srand(time(NULL));
 
-   /* creating neural network for XOR */
-  NeuralNetwork::Dense* NN[] = {
-    new NeuralNetwork::Dense(2, 3, new NeuralNetwork::Adam{}),
-    // new NeuralNetwork::Tanh{},
-    // new NeuralNetwork::Relu{},
-    new NeuralNetwork::LeakyRelu{alpha},
-    new NeuralNetwork::Dense(3, 1, new NeuralNetwork::Adam{}),
-    new NeuralNetwork::Sigmoid{}
-  };
+  NeuralNetwork::NeuralNetwork NN = NeuralNetwork::NeuralNetworkBuilder()
+    .set_hyperparametre_sgd()
+    .add_input_layer(2)
+    .add_hidden_layer(3).add_leakyRelu(alpha)
+    .add_output_layer(1).add_sigmoid()
+    .build();
 
 
   /* training data */
@@ -55,7 +55,7 @@ int main()
       Eigen::VectorXd target = y.row(j);
 
       /* forward */
-      for (auto layer : NN)
+      for (auto layer : NN.get_layers())
       {
         inputs = layer->forward(inputs);
       }
@@ -71,7 +71,7 @@ int main()
       /* loop from last to first*/
       for(int i = 3; i >= 0; i--)
       {
-        grad = NN[i]->backward(grad);
+        grad = NN.get_layers()[i]->backward(grad);
       }
     }
 
@@ -93,18 +93,12 @@ int main()
     Eigen::VectorXd inputs = X.row(i);
     Eigen::VectorXd target = y.row(i);
 
-    for (auto layer : NN)
+    for (auto layer : NN.get_layers())
     {
       inputs = layer->forward(inputs);
     }
 
     printf("target: %f, prediction: %f\n", target(0), inputs(0));
   }
-
-  for (NeuralNetwork::Dense* layer : NN)
-  {
-    delete layer;
-  }  
-
   return 0;
 }

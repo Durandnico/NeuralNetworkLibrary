@@ -1,4 +1,3 @@
-#pragma once
 /* **************************************************************************** */
 /*                                                                              */
 /*                                                       ::::::::  :::   :::    */
@@ -6,50 +5,50 @@
 /*                                                    +:+         +:+ +:+       */
 /*   By: Durandnico <durandnico@cy-tech.fr>          +#+          +#++:         */
 /*                                                 +#+           +#+            */
-/*   Created: 26/February/2024 by Durandnico   	  #+#    #+#    #+#             */
+/*   Created: 27/February/2024 by Durandnico   	  #+#    #+#    #+#             */
 /*                                                ########     ###              */
 /*                                                                              */
 /* **************************************************************************** */
 
 /*! 
- *  \file NeuralNetwork.hxx
+ *  \file NeuralNetwork.cxx
  *  \author DURAND Nicolas Erich Pierre <durandnico@cy-tech.fr>
  *  \version 0.1
- *  \date Mon 26 February 2024 - 23:42:14
+ *  \date Tue 27 February 2024 - 01:30:22
  *
  *  \brief 
- *      builder of neural network
+ *
  *
  */
 
 // Inclusion des entetes de librairies
-#include "Dense.hxx"
+#include "NeuralNetwork.hxx"
 #include "Activation.hxx"
+#include "Dense.hxx"
 #include "Optimizer.hxx"
+#include "global.hxx"
 #include <Eigen/Dense>
-#include <vector>
 #include <iostream>
 
 using namespace Eigen;
 
 namespace NeuralNetwork
 {
-  class NeuralNetwork
+  NeuralNetwork::NeuralNetwork(std::vector<Dense*> layers)
+    : layers{layers}
   {
-    private:
-      /* data */
-      std::vector<Dense*> layers;
+  }
 
-    protected:
-      /* data */
-      void add_layer(Dense* layer);
-      void add_activation(Activation* activation);
+  NeuralNetwork::~NeuralNetwork()
+  {
+    for(auto layer : layers)
+    {
+      delete layer;
+    }
+  }
 
-
-    public:
-      NeuralNetwork(std::vector<Dense*> layers);
-      ~NeuralNetwork();
-
-      std::vector<Dense*> get_layers();
-    };
+  std::vector<Dense*> NeuralNetwork::get_layers()
+  {
+    return layers;
+  }
 }
