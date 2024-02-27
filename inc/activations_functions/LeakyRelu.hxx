@@ -27,12 +27,12 @@
 
 namespace NeuralNetwork
 {
-  double leaky_relu(const double x, const double alpha)
+  inline double leaky_relu(const double x, const double alpha)
   {
     return std::max(alpha * x, x);
   }
 
-  double leaky_relu_prime(const double x, const double alpha)
+  inline double leaky_relu_prime(const double x, const double alpha)
   {
     return x > 0 ? 1 : alpha;
   }

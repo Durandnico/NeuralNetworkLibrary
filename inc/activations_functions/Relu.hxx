@@ -28,13 +28,13 @@
 namespace NeuralNetwork
 {
 
-  double relu(const double x)
+  inline double relu(const double x)
   {
     return std::max(0.0, x);
   }
 
 
-  double relu_prime(const double x)
+  inline double relu_prime(const double x)
   {
     return x > 0 ? 1 : 0;
   }

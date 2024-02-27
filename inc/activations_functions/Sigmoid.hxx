@@ -26,13 +26,13 @@
 
 namespace NeuralNetwork
 {
-  double sigmoid(const double x)
+  inline double sigmoid(const double x)
   {
     return 1 / (1 + std::exp(-x));
   }
 
 
-  double sigmoid_prime(const double x)
+  inline double sigmoid_prime(const double x)
   {
     return sigmoid(x) * (1 - sigmoid(x));
   }

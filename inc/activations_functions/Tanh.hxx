@@ -28,13 +28,13 @@
 namespace NeuralNetwork
 {
   
-   double tanh(const double x)
+  inline double tanh(const double x)
   {
     return std::tanh(x);
   }
 
 
-  double tanh_prime(const double x)
+  inline double tanh_prime(const double x)
   {
     return 1 - std::pow(tanh(x), 2);
   }
