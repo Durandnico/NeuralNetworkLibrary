@@ -5,6 +5,7 @@ doc
 
 # external lib
 eigen*
+*Pickling*
 
 # IDE config
 .vscode
