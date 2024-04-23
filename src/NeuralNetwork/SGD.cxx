@@ -40,9 +40,11 @@ namespace NeuralNetwork
 
   void SGD::update(NeuralNetwork::Dense* layer, const MatrixXd& output_grad)
   {
-    MatrixXd weights_grad = output_grad * layer->get_inputs().transpose();
-   
-    layer->set_weights(layer->get_weights() - learning_rate * weights_grad);
-    layer->set_biases(layer->get_biases() - learning_rate * output_grad);
+    for(int r = 0; r < output_grad.cols(); ++r)
+    {
+      MatrixXd weights_grad = output_grad.col(r) * layer->get_inputs().col(r).transpose();
+      layer->set_weights(layer->get_weights() - learning_rate * weights_grad);
+      layer->set_biases(layer->get_biases() - learning_rate * output_grad.col(r));
+    }
   }
 }

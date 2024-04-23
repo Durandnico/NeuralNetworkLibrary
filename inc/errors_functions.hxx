@@ -1,3 +1,4 @@
+#pragma once
 /* **************************************************************************** */
 /*                                                                              */
 /*                                                       ::::::::  :::   :::    */
@@ -29,22 +30,22 @@ using namespace Eigen;
 namespace NeuralNetwork
 {
 
-  double mean_squared_error(const VectorXd& y_true, const VectorXd& y_pred)
+  double inline mean_squared_error(const MatrixXd& y_true, const MatrixXd& y_pred)
   {
     return (y_true - y_pred).squaredNorm() / y_true.size();
   }
 
-  VectorXd mean_squared_error_prime(const VectorXd& y_true, const VectorXd& y_pred)
+  MatrixXd inline mean_squared_error_prime(const MatrixXd& y_true, const MatrixXd& y_pred)
   {
     return 2 * (y_pred - y_true) / y_true.size();
   }
 
-  double cross_entropy(const VectorXd& y_true, const VectorXd& y_pred)
+  double inline cross_entropy(const MatrixXd& y_true, const MatrixXd& y_pred)
   {
     return - (y_true.array() * y_pred.array().log() + (1 - y_true.array()) * (1 - y_pred.array()).log()).sum() / y_true.size();
   }
 
-  Eigen::VectorXd cross_entropy_prime(const VectorXd& y_true, const VectorXd& y_pred)
+  Eigen::VectorXd inline cross_entropy_prime(const MatrixXd& y_true, const MatrixXd& y_pred)
   {
     return - (y_true.array() / y_pred.array() - (1 - y_true.array()) / (1 - y_pred.array())) / y_true.size();
   }

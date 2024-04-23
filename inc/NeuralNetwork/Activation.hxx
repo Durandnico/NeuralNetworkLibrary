@@ -44,7 +44,7 @@ namespace NeuralNetwork
       Activation( std::function<double(const double)> , std::function<double(const double)>);
       ~Activation();
 
-      VectorXd forward(const MatrixXd& inputs) override;
-      VectorXd backward(const MatrixXd& output_grad) override;
+      MatrixXd forward(const MatrixXd& inputs) override;
+      MatrixXd backward(const MatrixXd& output_grad) override;
   };
 }

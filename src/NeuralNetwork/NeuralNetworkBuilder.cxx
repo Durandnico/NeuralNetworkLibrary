@@ -76,7 +76,7 @@ namespace NeuralNetwork
     const size_t n_layers = layers_size.size();
     for(size_t i = 1; i < n_layers; i++)
     {
-      if(i == 0)
+      if(optimizer == 0)
       {
         layers.emplace_back(new Dense(
           layers_size[i-1].first,

@@ -47,13 +47,19 @@ NeuralNetwork::Activation::~Activation()
 }
 
 
-VectorXd NeuralNetwork::Activation::forward(const MatrixXd& inputs) 
+MatrixXd NeuralNetwork::Activation::forward(const MatrixXd& inputs) 
 {
-  this->inputs = inputs;
+  this->inputs = inputs;  
   return inputs.unaryExpr(activation);
 }
 
-VectorXd NeuralNetwork::Activation::backward(const MatrixXd& output_grad)
+MatrixXd NeuralNetwork::Activation::backward(const MatrixXd& output_grad)
 {
-  return output_grad.cwiseProduct(inputs.unaryExpr(activation_prime));
+  MatrixXd output_grad_ = output_grad;
+  for(int r = 0; r < output_grad.cols(); ++r)
+  {
+    output_grad_.col(r) = output_grad.col(r).cwiseProduct(inputs.col(r).unaryExpr(activation_prime));
+  }
+
+  return output_grad_;
 }

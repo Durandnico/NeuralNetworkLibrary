@@ -26,6 +26,7 @@
 #include "Dense.hxx"
 #include "Activation.hxx"
 #include "Optimizer.hxx"
+#include "errors_functions.hxx"
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>
@@ -39,17 +40,28 @@ namespace NeuralNetwork
     private:
       /* data */
       std::vector<Dense*> layers;
+      std::function<double(const MatrixXd&, const MatrixXd&)> loss_fct = mean_squared_error;
+      std::function<MatrixXd(const MatrixXd&, const MatrixXd&)> loss_prime_fct = mean_squared_error_prime;
 
-    protected:
-      /* data */
-      void add_layer(Dense* layer);
-      void add_activation(Activation* activation);
-
+      MatrixXd forward(const MatrixXd& inputs);
+      void backward(MatrixXd& output_grad);
 
     public:
       NeuralNetwork(std::vector<Dense*> layers);
       ~NeuralNetwork();
 
       std::vector<Dense*> get_layers();
+      void set_loss(std::function<double(const MatrixXd&, const MatrixXd&)> loss_fct, std::function<MatrixXd(const MatrixXd&, const MatrixXd&)> loss_prime_fct);
+
+      double accuracy(const MatrixXd& inputs_test, const MatrixXd& targets_test);
+      double recall(const MatrixXd& inputs_test, const MatrixXd& targets_test);
+      double loss(const MatrixXd& inputs_test, const MatrixXd& targets_test);
+
+      void fit(const MatrixXd& inputs_train, const MatrixXd& targets_train, const int epochs, const int batch_size);
+      double validate(const MatrixXd& inputs_validate, const MatrixXd& targets_validate);
+      
+      MatrixXd confusion_matrix(const MatrixXd& inputs, const MatrixXd& targets);
+
+      MatrixXd predict(const MatrixXd& inputs);
     };
 }

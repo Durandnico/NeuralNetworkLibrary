@@ -53,20 +53,31 @@ NeuralNetwork::Dense::~Dense()
 
 
 
-VectorXd NeuralNetwork::Dense::forward(const MatrixXd& inputs)
+MatrixXd NeuralNetwork::Dense::forward(const MatrixXd& inputs)
 {
-  ASSERT(inputs.size() == n_inputs);
+  ASSERT(inputs.rows() == weights.cols());
 
   this->inputs = inputs;
-  return weights * inputs + biases;
+  MatrixXd tmp = weights * inputs;
+
+  /* add the biaises to all cols*/
+  for (int i = 0; i < tmp.cols(); i++)
+  {
+    tmp.col(i) +=  biases;
+  }
+
+  return tmp;
 }
 
 
-VectorXd NeuralNetwork::Dense::backward(const MatrixXd& output_grad)
+MatrixXd NeuralNetwork::Dense::backward(const MatrixXd& output_grad)
 {
-  ASSERT(output_grad.size() == n_outputs);
+  std::cout << "\n\n DENSE BACKPROP\n\n"; 
+  ASSERT(output_grad.rows() == n_outputs);
+  MatrixXd output_grad_{n_inputs ,output_grad_.rows()};
 
   optimizer->update(this, output_grad);
-  return weights.transpose() * output_grad;
+
+  return this->weights.transpose() * output_grad;
 }
 

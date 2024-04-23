@@ -46,6 +46,7 @@ namespace NeuralNetwork {
 
   void Adam::update(NeuralNetwork::Dense* layer, const MatrixXd& _output_grad)
   {
+    std::cout << "!!!!!!!!!!!output_grad: " << _output_grad << std::endl;
     t++;
     if(t == 1)
     {

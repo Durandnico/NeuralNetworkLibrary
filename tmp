@@ -1,0 +1,11 @@
+n_samples: 4
+n_batches: 1
+inputs_batch: 0 0
+0 1
+1 0
+1 1
+targets_batch: 0
+1
+1
+0
+outputs predict: 0.338211 0.391777 0.451131 0.542762

@@ -38,7 +38,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.$(EXTENSION)
 	@mkdir -p $(OBJ_DIR)	
 	$(CC) $(CFLAGS) $(INCLUDES) -I $(EIGEN_DIR) -c $< -o $@
 
-debug: clean
+debug: 
 	$(MAKE) LDFLAGS="$(LDFLAGS) -g" CFLAGS="$(CFLAGS) -g -D DEBUG" all --no-print-directory
 
 fsanitize: clean
