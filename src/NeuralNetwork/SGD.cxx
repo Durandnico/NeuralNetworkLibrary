@@ -38,11 +38,20 @@ namespace NeuralNetwork
   {
   }
 
-  void SGD::update(NeuralNetwork::Dense* layer, const MatrixXd& output_grad)
+  void SGD::update(NeuralNetwork::Dense* layer, const VectorXd& output_grad)
   {
     MatrixXd weights_grad = output_grad * layer->get_inputs().transpose();
    
     layer->set_weights(layer->get_weights() - learning_rate * weights_grad);
     layer->set_biases(layer->get_biases() - learning_rate * output_grad);
+  }
+
+  /* update with batch */
+  void SGD::update(NeuralNetwork::Dense* layer, const MatrixXd& output_grad)
+  {
+    MatrixXd weights_grad =  (output_grad.transpose() * layer->get_inputs()) / output_grad.cols(); // i don't know why we need to divide by the number of columns ?
+
+    layer->set_weights(layer->get_weights() - learning_rate * weights_grad);
+    layer->set_biases(layer->get_biases() - learning_rate * output_grad.colwise().mean().transpose());
   }
 }

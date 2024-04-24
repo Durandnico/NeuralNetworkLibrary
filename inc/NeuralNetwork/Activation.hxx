@@ -48,5 +48,6 @@ namespace NeuralNetwork
       VectorXd backward(const VectorXd& output_grad) override;
 
       MatrixXd forward(const MatrixXd& inputs) override;
+      MatrixXd backward(const MatrixXd& output_grad) override;
   };
 }

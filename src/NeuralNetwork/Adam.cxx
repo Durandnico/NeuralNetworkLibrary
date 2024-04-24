@@ -44,9 +44,9 @@ namespace NeuralNetwork {
   {
   }
 
-  void Adam::update(NeuralNetwork::Dense* layer, const MatrixXd& _output_grad)
+  void Adam::update(NeuralNetwork::Dense* layer, const VectorXd& _output_grad)
   {
-    t++;
+    ++t;
     if(t == 1)
     {
       m_weight = MatrixXd::Zero(layer->get_weights().rows(), layer->get_weights().cols());
@@ -76,4 +76,38 @@ namespace NeuralNetwork {
     layer->set_weights(layer->get_weights() - learning_rate *  m_weight_hat.cwiseQuotient(v_weight_hat.cwiseSqrt() + epsilon_weight));
     layer->set_biases(layer->get_biases() - learning_rate * m_bias_hat.cwiseQuotient((v_bias_hat.cwiseSqrt() + epsilon_bias)));
   }
+
+  /* update with batch */
+  void Adam::update(NeuralNetwork::Dense* layer, const MatrixXd& _output_grad)
+  {
+    ++t;
+    if(t == 1)
+    {
+      m_weight = MatrixXd::Zero(layer->get_weights().rows(), layer->get_weights().cols());
+      v_weight = MatrixXd::Zero(layer->get_weights().rows(), layer->get_weights().cols());
+      m_bias = VectorXd::Zero(layer->get_biases().rows());
+      v_bias = VectorXd::Zero(layer->get_biases().rows());
+
+      epsilon_bias = VectorXd::Constant(layer->get_biases().rows(), epsilon);
+      epsilon_weight = MatrixXd::Constant(layer->get_weights().rows(), layer->get_weights().cols(), epsilon);
+    }
+
+    MatrixXd weights_grad =  (_output_grad.transpose() * layer->get_inputs()) / _output_grad.cols();
+    MatrixXd biases_grad = _output_grad.colwise().mean().transpose();
+
+    m_weight = beta1 * m_weight + (1 - beta1) * weights_grad;
+    v_weight = beta2 * v_weight + (1 - beta2) * weights_grad.cwiseProduct(weights_grad);
+
+    m_bias = beta1 * m_bias + (1 - beta1) * biases_grad;
+    v_bias = beta2 * v_bias + (1 - beta2) * biases_grad.cwiseProduct(biases_grad);
+
+    MatrixXd m_weight_hat = m_weight / (1 - pow(beta1, t));
+    MatrixXd v_weight_hat = v_weight / (1 - pow(beta2, t));
+
+    MatrixXd m_bias_hat = m_bias / (1 - pow(beta1, t));
+    MatrixXd v_bias_hat = v_bias / (1 - pow(beta2, t));
+
+    layer->set_weights(layer->get_weights() - learning_rate *  m_weight_hat.cwiseQuotient(v_weight_hat.cwiseSqrt() + epsilon_weight));
+    layer->set_biases(layer->get_biases() - learning_rate * m_bias_hat.cwiseQuotient((v_bias_hat.cwiseSqrt() + epsilon_bias)));
+  }  
 }

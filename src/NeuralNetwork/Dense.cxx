@@ -78,8 +78,16 @@ VectorXd NeuralNetwork::Dense::backward(const VectorXd& output_grad)
 {
   ASSERT(output_grad.size() == n_outputs);
 
-  optimizer->update(this, output_grad);
+  optimizer->update(this, output_grad);  
   return weights.transpose() * output_grad;
 }
 
+/*  backward with batch */
+MatrixXd NeuralNetwork::Dense::backward(const MatrixXd& output_grad)
+{
+  ASSERT(output_grad.rows() == n_outputs);
+
+  optimizer->update(this, output_grad);
+  return output_grad * weights;
+}
 

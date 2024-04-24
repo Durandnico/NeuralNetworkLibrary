@@ -57,6 +57,7 @@ public:
   virtual VectorXd backward(const VectorXd& output_grad);
 
   virtual MatrixXd forward(const MatrixXd& inputs);
+  virtual MatrixXd backward(const MatrixXd& output_grad);
 
   inline MatrixXd& get_inputs() { return inputs; } 
   inline MatrixXd& get_weights() { return weights; }

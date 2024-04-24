@@ -35,6 +35,7 @@ namespace NeuralNetwork
   class Optimizer
   {
     public:
+    virtual void update(Dense* layer, const VectorXd& output_grad) = 0;
     virtual void update(Dense* layer, const MatrixXd& output_grad) = 0;
   };
 
@@ -47,7 +48,8 @@ namespace NeuralNetwork
     SGD(double _learning_rate = DEFAULT_LEARNING_RATE);
     ~SGD();
      
-    void update(Dense* layer, const MatrixXd& output_grad ) override;    
+    void update(Dense* layer, const VectorXd& output_grad ) override;
+    void update(Dense* layer, const MatrixXd& output_grad ) override;
   };
 
   class Adam : public Optimizer
@@ -69,6 +71,7 @@ namespace NeuralNetwork
     Adam(double _learning_rate = DEFAULT_LEARNING_RATE, double _beta1 = DEFAULT_BETA1, double _beta2 = DEFAULT_BETA2, double _epsilon = DEFAULT_EPSILON);
     ~Adam();
      
-    void update(Dense* layer, const MatrixXd& output_grad ) override;    
+    void update(Dense* layer, const VectorXd& output_grad ) override;    
+    void update(Dense* layer, const MatrixXd& output_grad ) override;
   };
 }

@@ -66,3 +66,9 @@ VectorXd NeuralNetwork::Activation::backward(const VectorXd& output_grad)
 {
   return output_grad.cwiseProduct(inputs.unaryExpr(activation_prime));
 }
+
+/* backward with batch */
+MatrixXd NeuralNetwork::Activation::backward(const MatrixXd& output_grad)
+{
+  return output_grad.cwiseProduct(inputs.unaryExpr(activation_prime));
+}
