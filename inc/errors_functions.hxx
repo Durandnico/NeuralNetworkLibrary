@@ -39,6 +39,19 @@ namespace NeuralNetwork
     return 2 * (y_pred - y_true) / y_true.size();
   }
 
+  /* version pour les batch */
+  Eigen::VectorXd mean_squared_error(const MatrixXd& y_true, const MatrixXd& y_pred)
+  {
+    return (y_true - y_pred).rowwise().squaredNorm() / y_true.cols();
+  }
+
+  Eigen::MatrixXd mean_squared_error_prime(const MatrixXd& y_true, const MatrixXd& y_pred)
+  {
+    return 2 * (y_pred - y_true) / y_true.cols();
+  }
+
+  /* ============================================================ */
+  
   double cross_entropy(const VectorXd& y_true, const VectorXd& y_pred)
   {
     return - (y_true.array() * y_pred.array().log() + (1 - y_true.array()) * (1 - y_pred.array()).log()).sum() / y_true.size();
