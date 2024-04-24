@@ -41,7 +41,7 @@ class Dense
 protected:
   /* data */
   MatrixXd weights;
-  MatrixXd biases;
+  VectorXd biases;
   MatrixXd inputs;
   Optimizer* optimizer;
 
@@ -53,12 +53,14 @@ public:
   Dense(const int _N_INPUTS, const int _N_OUTPUTS, Optimizer*);
   ~Dense();
 
-  virtual VectorXd forward(const MatrixXd& inputs);
-  virtual VectorXd backward(const MatrixXd& output_grad);
+  virtual VectorXd forward(const VectorXd& inputs);
+  virtual VectorXd backward(const VectorXd& output_grad);
+
+  virtual MatrixXd forward(const MatrixXd& inputs);
 
   inline MatrixXd& get_inputs() { return inputs; } 
   inline MatrixXd& get_weights() { return weights; }
-  inline MatrixXd& get_biases() { return biases; }
+  inline VectorXd& get_biases() { return biases; }
 
   inline void set_weights(const MatrixXd& _weights) { weights = _weights; }
   inline void set_biases(const MatrixXd& _biases) { biases = _biases; }

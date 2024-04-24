@@ -31,8 +31,8 @@
 using namespace Eigen;
 
 NeuralNetwork::Dense::Dense(const int n_inputs, const int n_outputs, Optimizer* optimizer)
-  : weights{MatrixXd::Random(n_outputs, n_inputs)},
-    biases{VectorXd::Random(n_outputs)},
+  : weights{MatrixXd::Random(n_outputs, n_inputs) * 0.25F},
+    biases{VectorXd::Zero(n_outputs)},
     optimizer{optimizer},
     n_inputs{n_inputs},
     n_outputs{n_outputs}
@@ -53,7 +53,7 @@ NeuralNetwork::Dense::~Dense()
 
 
 
-VectorXd NeuralNetwork::Dense::forward(const MatrixXd& inputs)
+VectorXd NeuralNetwork::Dense::forward(const VectorXd& inputs)
 {
   ASSERT(inputs.size() == n_inputs);
 
@@ -62,11 +62,24 @@ VectorXd NeuralNetwork::Dense::forward(const MatrixXd& inputs)
 }
 
 
-VectorXd NeuralNetwork::Dense::backward(const MatrixXd& output_grad)
+
+/* forward with batch */
+MatrixXd NeuralNetwork::Dense::forward(const MatrixXd& inputs)
+{
+  ASSERT(inputs.rows() == n_inputs);
+
+  this->inputs = inputs;
+  return (inputs * weights.transpose()).rowwise() + biases.transpose();
+}
+
+
+
+VectorXd NeuralNetwork::Dense::backward(const VectorXd& output_grad)
 {
   ASSERT(output_grad.size() == n_outputs);
 
   optimizer->update(this, output_grad);
   return weights.transpose() * output_grad;
 }
+
 
