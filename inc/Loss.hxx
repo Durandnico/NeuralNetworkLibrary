@@ -36,12 +36,12 @@ namespace NeuralNetwork
   {
     private:
       /* data */
-      std::function<VectorXd(const MatrixXd&, const MatrixXd&)> loss_batch;
+      std::function<double (const MatrixXd&, const MatrixXd&)> loss_batch;
       std::function<MatrixXd(const MatrixXd&, const MatrixXd&)> loss_batch_prime;
 
 
     public:
-      Loss(std::function<VectorXd(const MatrixXd&, const MatrixXd&)> _loss_batch, std::function<MatrixXd(const MatrixXd&, const MatrixXd&)> _loss_batch_prime) 
+      Loss(std::function<double (const MatrixXd&, const MatrixXd&)> _loss_batch, std::function<MatrixXd(const MatrixXd&, const MatrixXd&)> _loss_batch_prime) 
         : loss_batch{_loss_batch},
           loss_batch_prime{_loss_batch_prime}
       {};
@@ -52,12 +52,12 @@ namespace NeuralNetwork
       VectorXd prime(const VectorXd& y_true, const VectorXd& y_pred);
     #endif
 
-      inline virtual VectorXd operator()(const MatrixXd& y_true, const MatrixXd& y_pred) 
+      inline virtual double operator()(const MatrixXd& y_true, const MatrixXd& y_pred) 
       {
         return loss_batch(y_true, y_pred);
       }
 
-      inline virtual MatrixXd prime(const MatrixXd& y_true, const MatrixXd& y_pred)
+      inline virtual   MatrixXd prime(const MatrixXd& y_true, const MatrixXd& y_pred)
       {
         return loss_batch_prime(y_true, y_pred);
       }

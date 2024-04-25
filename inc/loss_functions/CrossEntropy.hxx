@@ -44,9 +44,22 @@ namespace NeuralNetwork
   }
 #endif
 
-  inline VectorXd cross_entropy(const MatrixXd& y_true, const MatrixXd& y_pred)
+  inline double cross_entropy(const MatrixXd& predicted, const MatrixXd& labels)
   {
-    return - (y_true.array() * y_pred.array().log() + (1 - y_true.array()) * (1 - y_pred.array()).log()).rowwise().sum() / y_true.cols();
+    // Assurez-vous que les dimensions des matrices correspondent
+    ASSERT(predicted.rows() == labels.rows() && predicted.cols() == labels.cols());
+
+    double loss = 0.0;
+    int numSamples = predicted.rows();
+
+    // Calcul de l'entropie croisée
+    for (int i = 0; i < numSamples; ++i) {
+        for (int j = 0; j < predicted.cols(); ++j) {
+            loss -= labels(i, j) * log(predicted(i, j) + 1e-9); // Ajoutez une petite valeur epsilon pour éviter le log(0)
+        }
+    }
+
+    return loss / numSamples;
   }
 
   inline MatrixXd cross_entropy_prime(const MatrixXd& y_true, const MatrixXd& y_pred)

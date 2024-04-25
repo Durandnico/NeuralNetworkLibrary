@@ -32,28 +32,51 @@ using namespace Eigen;
 namespace NeuralNetwork
 {
 
-  inline VectorXd huber(const MatrixXd& y_true, const MatrixXd& y_pred, const double epsi = 1.0)
-  {
-    const int cols = y_pred.cols();
-    VectorXd diff = (y_true - y_pred).rowwise().sum() / cols;
-    
-    for(double& err: diff)
-    {
-      if(abs(err) < epsi)
-        err = 0.5 * err * err;
+  inline double huber(const MatrixXd& labels, const MatrixXd& predicted, double delta) {
+    // Assurez-vous que les dimensions des matrices correspondent
+    ASSERT(predicted.rows() == labels.rows() && predicted.cols() == labels.cols());
 
-      else
-        err = epsi * (abs(err) - 0.5 * epsi);
+    double loss = 0.0;
+    int numSamples = predicted.rows();
 
+    // Calcul de la perte de Huber
+    for (int i = 0; i < numSamples; ++i) {
+        for (int j = 0; j < predicted.cols(); ++j) {
+            double error = predicted(i, j) - labels(i, j);
+            if (std::abs(error) <= delta) {
+                loss += 0.5 * error * error;
+            } else {
+                loss += delta * (std::abs(error) - 0.5 * delta);
+            }
+        }
     }
-    return diff;
+
+    return loss / numSamples;
   }
 
-  inline MatrixXd huber_prime(const MatrixXd& y_true, const MatrixXd& y_pred, const double delta = 1.0)
-  {
-    MatrixXd diff = y_true - y_pred;
-    MatrixXd loss = (diff.array().abs() < delta).select(diff, delta * diff.array().sign());
-    return loss / y_true.cols();
+
+  inline MatrixXd huber_prime(const MatrixXd& predicted, const MatrixXd& labels, double delta) {
+    // Assurez-vous que les dimensions des matrices correspondent
+    assert(predicted.rows() == labels.rows() && predicted.cols() == labels.cols());
+
+    int numSamples = predicted.rows();
+    int numDimensions = predicted.cols();
+
+    MatrixXd gradient = MatrixXd::Zero(numSamples, numDimensions);
+
+    // Calcul de la dérivée de la perte de Huber
+    for (int i = 0; i < numSamples; ++i) {
+        for (int j = 0; j < numDimensions; ++j) {
+            double error = predicted(i, j) - labels(i, j);
+            if (std::abs(error) <= delta) {
+                gradient(i, j) = error;
+            } else {
+                gradient(i, j) = (error > 0 ? 1 : -1);
+            }
+        }
+    }
+
+    return gradient;
   }
 
   class Huber
@@ -69,7 +92,7 @@ namespace NeuralNetwork
           m_delta{_delta}
       {};
 
-      VectorXd operator()(const MatrixXd& y_true, const MatrixXd& y_pred) override
+      double operator()(const MatrixXd& y_true, const MatrixXd& y_pred) override
       {
         return huber(y_true, y_pred, m_delta);
       }

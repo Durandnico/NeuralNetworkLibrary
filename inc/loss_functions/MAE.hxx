@@ -13,10 +13,10 @@
 #pragma once
 
 /*! 
- *  \file MSE.hxx
+ *  \file MAE.hxx
  *  \author DURAND Nicolas Erich Pierre <durandnico@cy-tech.fr>
  *  \version 0.1
- *  \date Wed 24 April 2024 - 14:53:16
+ *  \date Wed 24 April 2024 - 21:44:54
  *
  *  \brief 
  *
@@ -31,48 +31,49 @@ using namespace Eigen;
 
 namespace NeuralNetwork
 {
-  #if 0
-  inline double mean_squared_error(const VectorXd& y_true, const VectorXd& y_pred)
-  {
-    return (y_true - y_pred).squaredNorm() / y_true.size();
-  }
 
-  inline VectorXd mean_squared_error_prime(const VectorXd& y_true, const VectorXd& y_pred)
-  {
-    return 2 * (y_pred - y_true) / y_true.size();
-  }
-  #endif
-
-  /* version pour les batch */
-  double mean_squared_error(const MatrixXd& labels, const MatrixXd& predicted) {
+  inline double mae(const MatrixXd& labels, const MatrixXd& predicted) {
     // Assurez-vous que les dimensions des matrices correspondent
-    assert(predicted.rows() == labels.rows() && predicted.cols() == labels.cols());
+    ASSERT(predicted.rows() == labels.rows() && predicted.cols() == labels.cols());
 
-    double mse = 0.0;
+    double loss = 0.0;
     int numSamples = predicted.rows();
 
-    // Calcul de l'erreur quadratique moyenne
+    // Calcul de la perte de MAE
     for (int i = 0; i < numSamples; ++i) {
-        mse += (predicted.row(i) - labels.row(i)).squaredNorm();
+        for (int j = 0; j < predicted.cols(); ++j) {
+            loss += std::abs(predicted(i, j) - labels(i, j));
+        }
     }
 
-    return mse / numSamples;
-}
-
-  inline MatrixXd mean_squared_error_prime(const MatrixXd& y_true, const MatrixXd& y_pred)
-  {
-    return 2 * (y_pred - y_true) / y_true.cols();
+    return loss / numSamples;
   }
 
-  class MSE
+  inline MatrixXd mae_prime(const MatrixXd& predicted, const MatrixXd& labels) {
+    // Assurez-vous que les dimensions des matrices correspondent
+    ASSERT(predicted.rows() == labels.rows() && predicted.cols() == labels.cols());
+
+    int numSamples = predicted.rows();
+    MatrixXd loss_prime = MatrixXd::Zero(predicted.rows(), predicted.cols());
+
+    // Calcul de la dérivée de la perte de MAE
+    for (int i = 0; i < numSamples; ++i) {
+        for (int j = 0; j < predicted.cols(); ++j) {
+            loss_prime(i, j) = (predicted(i, j) > labels(i, j)) ? 1 : -1;  // <= WARNING : Il n'y a pas de dérivée en 0 !!!!
+        }
+    }
+
+    return loss_prime / numSamples;
+  }
+
+  class MAE
     : public Loss
   {
-    
     public:
-      MSE()
-        : Loss{mean_squared_error, mean_squared_error_prime}
-      { 
-      }
+      MAE()
+        : Loss(mae, mae_prime)
+      {};
+
   };
 
 }
