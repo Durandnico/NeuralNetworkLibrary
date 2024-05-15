@@ -44,7 +44,7 @@ namespace NeuralNetwork
   #endif
 
   /* version pour les batch */
-  double mean_squared_error(const MatrixXd& labels, const MatrixXd& predicted) {
+  inline double mean_squared_error(const MatrixXd& labels, const MatrixXd& predicted) {
     // Assurez-vous que les dimensions des matrices correspondent
     assert(predicted.rows() == labels.rows() && predicted.cols() == labels.cols());
 

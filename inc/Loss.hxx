@@ -57,7 +57,7 @@ namespace NeuralNetwork
         return loss_batch(y_true, y_pred);
       }
 
-      inline virtual   MatrixXd prime(const MatrixXd& y_true, const MatrixXd& y_pred)
+      inline virtual MatrixXd prime(const MatrixXd& y_true, const MatrixXd& y_pred)
       {
         return loss_batch_prime(y_true, y_pred);
       }
