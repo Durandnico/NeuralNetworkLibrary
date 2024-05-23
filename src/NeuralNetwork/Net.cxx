@@ -181,33 +181,45 @@ namespace NeuralNetwork
     return 0.;
   }
 
-  // double Net::recall(const MatrixXd& inputs, const MatrixXd& targets)
-  // {
-  //   const MatrixXd outputs = forward(inputs);
-  //   const MatrixXd predictions = outputs.unaryExpr([](double x) { return x > 0.5 ? 1 : 0; });
-  //   const MatrixXd true_positives = (predictions.array() == 1 && targets.array() == 1).cast<double>();
-  //   const MatrixXd false_negatives = (predictions.array() == 0 && targets.array() == 1).cast<double>();
-  //   return true_positives.sum() / (true_positives.sum() + false_negatives.sum());
-  // }
+  double Net::recall(const MatrixXd& inputs, const MatrixXd& targets)
+  {
+    const MatrixXd outputs = this->predict(inputs);
+    
+    MatrixXd predictions(outputs.rows(), outputs.cols());
+    for (int i = 0; i < outputs.rows(); ++i)
+      for (int j = 0; j < outputs.cols(); ++j)
+        predictions(i, j) = outputs(i, j) > 0.5 ? 1 : 0;
+
+    const MatrixXd true_positives = (predictions.array() == 1 && targets.array() == 1).cast<double>();
+    const MatrixXd false_positives = (predictions.array() == 1 && targets.array() == 0).cast<double>();
+    return true_positives.sum() / (true_positives.sum() + false_positives.sum());
+
+    return 0.;
+  }
 
 
-  // MatrixXd Net::confusion_matrix(const MatrixXd& inputs, const MatrixXd& targets)
-  // {
-  //   const MatrixXd outputs = forward(inputs);
-  //   const MatrixXd predictions = outputs.unaryExpr([](double x) { return x > 0.5 ? 1 : 0; });
-  //   const MatrixXd true_positives = (predictions.array() == 1 && targets.array() == 1).cast<double>();
-  //   const MatrixXd false_positives = (predictions.array() == 1 && targets.array() == 0).cast<double>();
-  //   const MatrixXd true_negatives = (predictions.array() == 0 && targets.array() == 0).cast<double>();
-  //   const MatrixXd false_negatives = (predictions.array() == 0 && targets.array() == 1).cast<double>();
+  MatrixXd Net::confusion_matrix(const MatrixXd& inputs, const MatrixXd& targets)
+  {
+    const MatrixXd outputs = this->predict(inputs);
+    
+    MatrixXd predictions(outputs.rows(), outputs.cols());
+    for (int i = 0; i < outputs.rows(); ++i)
+      for (int j = 0; j < outputs.cols(); ++j)
+        predictions(i, j) = outputs(i, j) > 0.5 ? 1 : 0;
 
-  //   MatrixXd confusion_matrix(2, 2);
-  //   confusion_matrix << true_positives.sum(), false_positives.sum(),
-  //                       false_negatives.sum(), true_negatives.sum();
+    const MatrixXd true_positives = (predictions.array() == 1 && targets.array() == 1).cast<double>();
+    const MatrixXd false_positives = (predictions.array() == 1 && targets.array() == 0).cast<double>();
+    const MatrixXd true_negatives = (predictions.array() == 0 && targets.array() == 0).cast<double>();
+    const MatrixXd false_negatives = (predictions.array() == 0 && targets.array() == 1).cast<double>();
 
-  //   return confusion_matrix;
-  // }
+    MatrixXd confusion_matrix(2, 2);
+    confusion_matrix(0, 0) = true_positives.sum();
+    confusion_matrix(0, 1) = false_positives.sum();
+    confusion_matrix(1, 0) = false_negatives.sum();
+    confusion_matrix(1, 1) = true_negatives.sum();
 
-
+    return confusion_matrix;
+  }
 
   /* ======================================================================== */
   /* getters */

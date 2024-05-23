@@ -58,13 +58,13 @@ namespace NeuralNetwork
       void set_loss(std::unique_ptr<Loss> loss_fct);
 
       double accuracy(const MatrixXd& inputs_test, const MatrixXd& targets_test);
-      // double recall(const MatrixXd& inputs_test, const MatrixXd& targets_test);
+      double recall(const MatrixXd& inputs_test, const MatrixXd& targets_test);
       double loss(const MatrixXd& inputs_test, const MatrixXd& targets_test);
 
       void fit(const MatrixXd& inputs_train, const MatrixXd& targets_train, const int epochs, const int batch_size);
       double validate(const MatrixXd& inputs_validate, const MatrixXd& targets_validate);
       
-      // MatrixXd confusion_matrix(const MatrixXd& inputs, const MatrixXd& targets);
+      MatrixXd confusion_matrix(const MatrixXd& inputs, const MatrixXd& targets);
 
       MatrixXd predict(const MatrixXd& inputs);
       VectorXd predict(const VectorXd& inputs);
