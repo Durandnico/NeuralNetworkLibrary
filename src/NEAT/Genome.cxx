@@ -39,35 +39,26 @@ Genome::Genome(const int genome_id, const int num_inputs, const int num_outputs)
   /* create all the outputs */
   for (int i = 0; i < num_outputs; i++)
   {
-    const int id = i + 1;
-    genes.emplace(id,Gene(id));
+    genes.emplace(i ,Gene(i));
   }
 
   /* create all the synapses between inputs & outputs*/
-  int id = num_outputs + 1;
+  int id = num_outputs;
   for (int i = 0; i < num_inputs; i++)
   {
     for (int j = 0; j < num_outputs; j++)
     {
-      synapses.emplace(id, Synapse{id, -i - 1, j + 1});
-      ++id;
-      // synapses[id] = Synapse(id++, -i - 1, j + 1);
+      synapses.emplace_back(Synapse{id++, -i - 1, j});
     }
   }
 }
 
 Genome::Genome(const Genome& genome)
-  : genome_id(genome.get_genome_id()), num_inputs(genome.get_num_inputs()), num_outputs(genome.get_num_outputs())
+  : genome_id(genome.get_genome_id()), num_inputs(genome.get_num_inputs()), num_outputs(genome.get_num_outputs()), synapses(genome.get_synapses())
 {
   for(const auto& gene : genome.get_genes())
   {
     genes.emplace(gene.first, gene.second);
-  }
-
-  for(const auto& synapse : genome.get_synapses())
-  {
-    synapses.emplace(synapse.first, synapse.second);
-    // synapses[synapse.first] = Synapse(synapse.second);
   }
 }
 
@@ -124,12 +115,13 @@ void Genome::mutate_remove_gene(Genome& genome)
 
 void Genome::add_gene(const Gene& gene)
 {
-  // genes[gene.get_innovation_id()] = gene;
+  assert(genes.find(gene.get_innovation_id()) == genes.end());
+  genes.emplace(gene.get_innovation_id(), gene);
 }
 
 void Genome::add_synapse(const Synapse& synapse)
 {
-  // synapses[synapse.get_innovation_id()] = synapse;
+  synapses.emplace_back(synapse);
 }
 
 /* getters & setters */
@@ -179,21 +171,20 @@ void Genome::set_genes(const std::unordered_map<int, Gene>& genes)
   this->genes = genes;
 }
 
-std::unordered_map<int, Synapse>& Genome::get_synapses()
+std::vector<Synapse>& Genome::get_synapses()
 {
   return synapses;
 }
 
-const std::unordered_map<int, Synapse>& Genome::get_synapses() const
+const std::vector<Synapse>& Genome::get_synapses() const
 {
   return synapses;
 }
 
-void Genome::set_synapses(const std::unordered_map<int, Synapse>& synapses)
+void Genome::set_synapses(const std::vector<Synapse>& synapses)
 {
   this->synapses = synapses;
 }
-
 // End of NeuralNetwork/NEAT/Genome.cxx
 
         

@@ -42,7 +42,7 @@ namespace NeuralNetwork
         int num_inputs;
         int num_outputs;
         std::unordered_map<int, Gene> genes;
-        std::unordered_map<int, Synapse> synapses;
+        std::vector<Synapse> synapses;
 
         
       public:
@@ -81,9 +81,9 @@ namespace NeuralNetwork
         const std::unordered_map<int, Gene>& get_genes() const;
         void set_genes(const std::unordered_map<int, Gene>& genes);
 
-        std::unordered_map<int, Synapse>& get_synapses();
-        const std::unordered_map<int, Synapse>& get_synapses() const;
-        void set_synapses(const std::unordered_map<int, Synapse>& synapses);
+        std::vector<Synapse>& get_synapses();
+        const std::vector<Synapse>& get_synapses() const;
+        void set_synapses(const std::vector<Synapse>& synapses);
     };
   }
 }
