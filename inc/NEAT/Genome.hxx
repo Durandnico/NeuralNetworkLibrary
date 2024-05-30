@@ -24,7 +24,6 @@
  */
 
 // Inclusion des entetes de librairies
-#include <unordered_map>
 #include <vector>
 
 #include "Gene.hxx"
@@ -41,10 +40,10 @@ namespace NeuralNetwork
         int genome_id;
         int num_inputs;
         int num_outputs;
-        std::unordered_map<int, Gene> genes;
+        std::vector<Gene> genes;
         std::vector<Synapse> synapses;
+        int innovationNo;
 
-        
       public:
         Genome(const int genome_id, const int num_inputs, const int num_outputs);
         Genome(const Genome& genome);
@@ -62,9 +61,10 @@ namespace NeuralNetwork
         static void mutate_add_gene(Genome& genome);
         static void mutate_remove_gene(Genome& genome);
 
-
         /* methods */
+        int auto_add_gene();
         void add_gene(const Gene& gene);
+        int auto_add_synapse(const int id_in, const int id_out, const double weight);
         void add_synapse(const Synapse& synapse);
 
         /* getters & setters */
@@ -77,13 +77,20 @@ namespace NeuralNetwork
         int get_num_outputs() const;
         void set_num_outputs(const int num_outputs);
 
-        std::unordered_map<int, Gene>& get_genes();
-        const std::unordered_map<int, Gene>& get_genes() const;
-        void set_genes(const std::unordered_map<int, Gene>& genes);
+        std::vector<Gene>& get_genes();
+        const std::vector<Gene>& get_genes() const;
+        void set_genes(const std::vector<Gene>& genes);
 
         std::vector<Synapse>& get_synapses();
         const std::vector<Synapse>& get_synapses() const;
         void set_synapses(const std::vector<Synapse>& synapses);
+
+        size_t get_num_hidden_genes() const;
+        std::vector<Gene>::iterator find_gene_by_id(int id);
+        std::vector<Gene>::const_iterator find_gene_by_id(const int innovation_id) const;
+
+        int get_innovationNo() const;
+        void set_innovationNo(const int);
     };
   }
 }

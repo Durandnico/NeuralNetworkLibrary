@@ -23,8 +23,10 @@
 
 // Inclusion des entetes de librairies
 #include "Synapse.hxx"
+#include "Mutator.hxx"
 #include <random>
 #include <ostream>
+#include <cassert>
 
 
 using namespace NeuralNetwork::NEAT;
@@ -76,16 +78,38 @@ Synapse& Synapse::operator=(const Synapse& synapse)
 }
 
 
+/* mutation */
+
 Synapse Synapse::cross_over_synapse(const Synapse& synapse1, const Synapse& synapse2)
 {
-  /* TODO*/
-  return Synapse{synapse1.get_innovation_id(), synapse1.get_linkIds(), synapse1.get_weight(), synapse1.get_enabled()};
+  assert(synapse1.get_innovation_id() == synapse2.get_innovation_id());
+  const double new_weight = Mutator::choose(0.5, synapse1.get_weight(), synapse2.get_weight());
+  const bool new_enabled = Mutator::choose(0.5, synapse1.get_enabled(), synapse2.get_enabled());
+
+  return Synapse{synapse1.get_innovation_id(), synapse1.get_linkIds(), new_weight, new_enabled};
 }
 
 void Synapse::mutateWeight()
 {
-  /* TODO */
+  weight = Mutator::get_instance()->mutate_delta(weight);
 }
+
+
+
+
+/* methods */
+bool Synapse::linked_to(const int gene_id_in, const int gene_id_out) const
+{
+  return linkIds.id_in == gene_id_in && linkIds.id_out == gene_id_out;
+}
+
+bool Synapse::linked_to(const int gene_id) const
+{
+  return linkIds.id_in == gene_id || linkIds.id_out == gene_id;
+}
+
+
+
 
 /* getters & setters */
 

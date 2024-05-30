@@ -70,6 +70,10 @@ namespace NeuralNetwork
         static Synapse cross_over_synapse(const Synapse& synapse1, const Synapse& synapse2);
         void mutateWeight();
 
+        /* methods */
+        bool linked_to(const int gene_id) const;
+        bool linked_to(const int gene_id_in, const int gene_id_out) const;
+
         /* getters & setters */
         int get_innovation_id() const;
         void set_innovation(const int innovation);
@@ -81,7 +85,7 @@ namespace NeuralNetwork
         void set_enabled(const bool enabled);
 
         linkIds_t get_linkIds() const;
-        void set_linkIds(const linkIds_t linkIds);
+        void set_linkIds(const linkIds_t linkIds);  
     };
   }
 }

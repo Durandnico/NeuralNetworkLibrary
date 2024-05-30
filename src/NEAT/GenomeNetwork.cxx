@@ -211,9 +211,11 @@ GenomeNetwork GenomeNetwork::create_from_genome(const Genome& genome)
         }
       }
       
-      auto neuron_gene_opt = genome.get_genes().find(neurone_id);
+      
+      // search for a gene with the same id
+      auto neuron_gene_opt = genome.find_gene_by_id(neurone_id);
       assert(neuron_gene_opt != genome.get_genes().end());
-      neurones.emplace_back(Neurone_t{neurone_id, neuron_gene_opt->second.get_bias(), std::move(neuron_inputs)});
+      neurones.emplace_back(Neurone_t{neurone_id, neuron_gene_opt->get_bias(), std::move(neuron_inputs)});
     }
   }
 

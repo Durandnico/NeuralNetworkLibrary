@@ -60,9 +60,9 @@ namespace NeuralNetwork
             return os;
           }
 
-        /* static methods */
+        /* mutation */
         static Gene cross_over_gene(const Gene& gene1, const Gene& gene2); 
-        void mutateBias();       
+        void mutateBias();
         
         /* getters & setters */
         int get_innovation_id() const;

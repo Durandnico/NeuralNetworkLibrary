@@ -42,6 +42,13 @@ Genome Individual::cross_over(const Individual& dominant, const Individual& rece
   return Genome(individual_id, inputs, outputs);
 }
 
+
+
+
+
+
+
+
 /* getters & setters */
 
 double Individual::get_fitness() const
