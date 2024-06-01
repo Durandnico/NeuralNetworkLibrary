@@ -56,16 +56,6 @@ void Mutator::set_config(const mutationConfig_t& config)
   this->config = config;
 }
 
-bool Mutator::mutation_occurs() const
-{
-  return this->next_bernoulli(config.mutation_rate);
-}
-
-bool Mutator::mutation_topology_occurs() const
-{
-  return this->next_bernoulli(config.replace_rate);
-}
-
 double Mutator::new_value()
 {
   std::normal_distribution<double> new_value_generator{config.init_mean, config.init_std_dev};

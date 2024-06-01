@@ -43,6 +43,8 @@ namespace NeuralNetwork::NEAT
       std::random_device rd;
       std::mt19937 gen;
       
+      int genome_id = 0;
+
       double clamp(const double value) const;
       Mutator(mutationConfig_t);
       Mutator();
@@ -55,10 +57,6 @@ namespace NeuralNetwork::NEAT
       /*  =======================  method ========================= */
       static Mutator* get_instance();
       void set_config(const mutationConfig_t& config);
-
-      /* Mutation methods */ 
-      bool mutation_occurs() const;
-      bool mutation_topology_occurs() const;
       
       double new_value();
       double mutate_delta(const double value);
@@ -74,6 +72,11 @@ namespace NeuralNetwork::NEAT
       {
         /* generate number between 0 and 1*/
         return Mutator::next_bernoulli(p) ? a : b;
+      }
+
+      inline int next_genome_id()
+      {
+        return genome_id++;
       }
   };
 }

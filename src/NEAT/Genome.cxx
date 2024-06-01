@@ -24,6 +24,7 @@
 // Inclusion des entetes de librairies
 #include "Genome.hxx"
 #include "Mutator.hxx"
+#include "NEATconfig.hxx"
 #include <cassert>
 
 
@@ -251,6 +252,15 @@ void Genome::add_synapse(const Synapse& synapse)
   synapses.emplace_back(synapse);
 }
 
+void Genome::mutate()
+{
+  if(Mutator::next_bernoulli(NeatGlobalconfig.node_add_rate)) // on ajoute un gène
+    mutate_add_gene(*this);
+
+  if(Mutator::next_bernoulli(NeatGlobalconfig.conn_add_prob)) // on ajoute une synapse
+    mutate_add_synapse(*this);
+}
+
 
 
 
@@ -340,6 +350,17 @@ std::vector<Gene>::const_iterator Genome::find_gene_by_id(const int innovation_i
 {
   return std::find_if(genes.begin(), genes.end(), [innovation_id](const Gene& gene){return gene.get_innovation_id() == innovation_id;});
 }
+
+std::vector<Synapse>::iterator Genome::find_synapse_by_id(linkIds_t link_id)
+{
+  return std::find_if(synapses.begin(), synapses.end(), [link_id](const Synapse& synapse){return synapse.get_linkIds() == link_id;});
+}
+
+std::vector<Synapse>::const_iterator Genome::find_synapse_by_id(const linkIds_t link_id) const
+{
+  return std::find_if(synapses.begin(), synapses.end(), [link_id](const Synapse& synapse){return synapse.get_linkIds() == link_id;});
+}
+
 
 int Genome::get_innovationNo() const
 {

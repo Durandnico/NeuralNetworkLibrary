@@ -34,6 +34,12 @@ namespace NeuralNetwork
     {
       int id_in;
       int id_out;
+
+      inline bool operator==(const linkIds_s& linkIds) const
+      {
+        return (id_in == linkIds.id_in && id_out == linkIds.id_out);
+      }
+
     }               linkIds_t;
     
     class Synapse

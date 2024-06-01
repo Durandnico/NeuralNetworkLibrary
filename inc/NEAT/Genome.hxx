@@ -66,6 +66,7 @@ namespace NeuralNetwork
         void add_gene(const Gene& gene);
         int auto_add_synapse(const int id_in, const int id_out, const double weight);
         void add_synapse(const Synapse& synapse);
+        void mutate();
 
         /* getters & setters */
         int get_genome_id() const;
@@ -88,6 +89,8 @@ namespace NeuralNetwork
         size_t get_num_hidden_genes() const;
         std::vector<Gene>::iterator find_gene_by_id(int id);
         std::vector<Gene>::const_iterator find_gene_by_id(const int innovation_id) const;
+        std::vector<Synapse>::iterator find_synapse_by_id(linkIds_t link_id);
+        std::vector<Synapse>::const_iterator find_synapse_by_id(const linkIds_t link_id) const;
 
         int get_innovationNo() const;
         void set_innovationNo(const int);
