@@ -26,6 +26,7 @@
 // Inclusion des entetes de librairies
 
 #include "Genome.hxx"
+#include "GenomeNetwork.hxx"
 
 namespace NeuralNetwork 
 {
@@ -37,15 +38,44 @@ namespace NeuralNetwork
         /* data */
         int individual_id;
         Genome genome;
+        GenomeNetwork network;
         double fitness;
+        double unajusted_fitness;
+
+        std::vector<double> vision; // input
+        std::vector<double> decision; // output
+
+        bool dead = false;
+        double score = 0.;
 
       public:
         Individual(const int individual_id, const Genome& genome);
-        Individual(const Individual& individual) = default;
+        Individual(const Individual& individual);
         ~Individual() = default;
+
+        /* operator overload */
+
+        // copy
+        Individual& operator=(const Individual& obj);
 
         /* static methods */
         static Genome cross_over(const Individual& dominant, const Individual& recessive);
+
+        /* methodes */
+        Individual copy() const;
+        inline void generateNetwork()
+        {
+          network = GenomeNetwork::create_from_genome(genome);
+        }
+        
+        inline double calculateFitness();
+        inline void show() = delete;
+        inline void move();
+        inline void update();
+        inline void look();
+        inline void think();
+
+
 
         /* getters & setters */
         double get_fitness() const;
@@ -53,6 +83,11 @@ namespace NeuralNetwork
 
         const Genome& get_genome() const;
         void set_genome(const Genome& genome);
+
+        const GenomeNetwork& get_network() const;
+        bool isDead() const;
+        double getScore() const;
+        double getUnajustedFitness() const;
     };
   }
 }

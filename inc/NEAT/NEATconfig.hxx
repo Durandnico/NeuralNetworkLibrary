@@ -63,6 +63,7 @@ typedef struct NEATconfig_s
 
   double elitism_rate = 0.1; // la proportion de la population qui est conservée pour la génération suivante
   int elistism_min_species = 1; // le nombre minimum d'espèces à conserver
+  int age_of_death_of_trisomie21 = 15; // c'est le stalness en gros
 
   double survival_rate = 0.5; // la proportion de la population qui survit à chaque génération
   

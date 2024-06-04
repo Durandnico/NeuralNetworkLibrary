@@ -54,6 +54,7 @@ namespace NeuralNetwork::NEAT
 
 
       Mutator(const Mutator& obj) = delete; 
+      Mutator& operator=(const Mutator& obj) = delete;
       /*  =======================  method ========================= */
       static Mutator* get_instance();
       void set_config(const mutationConfig_t& config);
@@ -80,6 +81,3 @@ namespace NeuralNetwork::NEAT
       }
   };
 }
-
-// create the instance
-NeuralNetwork::NEAT::Mutator* NeuralNetwork::NEAT::Mutator::instance = new Mutator(default_mutation_config);

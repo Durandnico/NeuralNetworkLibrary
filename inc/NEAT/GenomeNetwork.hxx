@@ -50,7 +50,7 @@ namespace NeuralNetwork::NEAT
     public:
 
       GenomeNetwork(std::vector<int> inputs_ids, std::vector<int> outputs_ids, std::vector<Neurone_t> neurones);
-
+      GenomeNetwork() = default;
       ~GenomeNetwork() = default;
 
       std::vector<double> activate(const std::vector<double>& inputs);

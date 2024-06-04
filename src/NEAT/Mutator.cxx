@@ -48,6 +48,9 @@ double Mutator::clamp(const double value) const
 
 Mutator* Mutator::get_instance()
 {
+  if (!instance)
+    instance = new Mutator();
+  
   return instance;
 }
 

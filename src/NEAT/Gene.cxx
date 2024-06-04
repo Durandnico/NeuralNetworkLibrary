@@ -70,7 +70,6 @@ Gene Gene::cross_over_gene(const Gene& gene1, const Gene& gene2)
 {
   assert(gene1.get_innovation_id() == gene2.get_innovation_id());
 
-  int neuron_id = gene1.get_innovation_id();
   double bias = Mutator::choose(0.5, gene1.get_bias(), gene2.get_bias());
   return Gene{gene1.get_innovation_id(), bias};
 }

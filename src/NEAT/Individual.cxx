@@ -34,6 +34,23 @@ Individual::Individual(const int individual_id, const Genome& genome)
 {
 }
 
+Individual::Individual(const Individual& individual)
+  : individual_id(individual.individual_id), genome(individual.genome), fitness(individual.fitness)
+{
+}
+
+/* operator overload */
+
+// copy
+Individual& Individual::operator=(const Individual& obj)
+{
+  individual_id = obj.individual_id;
+  genome = obj.genome;
+  fitness = obj.fitness;
+
+  return *this;
+}
+
 Genome Individual::cross_over(const Individual& dominant, const Individual& recessive)
 {
   Genome offspring{Mutator::get_instance()->next_genome_id(), dominant.get_genome().get_num_inputs(),
@@ -100,6 +117,73 @@ Genome Individual::cross_over(const Individual& dominant, const Individual& rece
 
 
 
+double Individual::calculateFitness()
+{
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+}
+
+
+void Individual::move()
+{
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+}
+
+void Individual::update()
+{
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+}
+
+void Individual::look()
+{
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+}
+
+void Individual::think()
+{
+  double max = 0;
+  int maxIndex = 0;
+  //get the output of the neural network
+  decision = network.activate(vision);
+
+  const int choices = decision.size();
+  for (int i = 0; i < choices; ++i) {
+    if (decision[i] > max) {
+      max = decision[i];
+      maxIndex = i;
+    }
+  }
+    
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+}
+
+void Individual::show()
+{
+  // TODO
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* methodes */
+
+Individual Individual::copy() const
+{
+  return Individual{*this};
+}
 
 
 
@@ -127,3 +211,23 @@ void Individual::set_genome(const Genome& genome)
   this->genome = genome;
 }
 
+const GenomeNetwork& Individual::get_network() const
+{
+  return network;
+}
+
+bool Individual::isDead() const
+{
+  return dead;
+}
+
+
+double Individual::getScore() const
+{
+  return score;
+}
+
+double Individual::getUnajustedFitness() const
+{
+  return unajusted_fitness;
+}
