@@ -232,6 +232,14 @@ namespace NeuralNetwork::NEAT
     return *(m_individuals.front().lock());
   }
 
+  const std::vector<std::weak_ptr<Individual>> Species::getElite() const
+  {
+    const size_t numberOfElite = std::max(NeatGlobalconfig.elistism_min_species, (int) std::floor(NeatGlobalconfig.elitism_rate * m_individuals.size()));
+    const auto lastElit = m_individuals.begin() + numberOfElite;
+    
+    return std::vector<std::weak_ptr<Individual>>{m_individuals.begin(), lastElit};
+  }
+
   double Species::getBestFitness() const
   {
     return m_bestFitness;
@@ -246,5 +254,10 @@ namespace NeuralNetwork::NEAT
   {
     return m_staleness;
   }
+
+  const std::vector<std::weak_ptr<Individual>>& Species::get_individuals() const 
+  {
+    return m_individuals;
+  }  
 
 } // namespace NeuralNetwork::NEAT

@@ -68,9 +68,11 @@ namespace NeuralNetwork::NEAT
 
       /* getters & setters */
       const Individual& getBestIndividual() const;
+      const std::vector<std::weak_ptr<Individual>> getElite() const;
       double getBestFitness() const;
       double getAvgFitness() const;
       double getStaleness() const;
       // int get_species_id() const;
+      const std::vector<std::weak_ptr<Individual>>& get_individuals() const;
   };
 }

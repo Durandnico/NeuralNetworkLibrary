@@ -39,15 +39,21 @@ namespace NeuralNetwork::NEAT
 Population::Population(int size, int num_inputs, int num_outputs)
 {
   m_individuals.reserve(size);
-  
+  Genome firstone{0, num_inputs, num_outputs};
+  Genome& last_brain = firstone;
+
   for (int i = 0; i < size; i++)
   {
-    Genome brain{i, num_inputs, num_outputs};
-    const int numMutation = i/10; 
+    Genome brain{last_brain}; // copy afin de garder la topologie 
+    brain.set_genome_id(i);
+
+    const int numMutation = i * NeatGlobalconfig.population_mutation_ratio; 
 
     for (int j = 0; j < numMutation; ++j)
       brain.mutate();
-  
+
+    brain.mutateWeightAndBias();
+    last_brain = brain; 
     m_individuals.push_back(std::make_shared<Individual>(std::move(Individual{i, std::move(brain)})));;
   }
 } 
@@ -92,7 +98,61 @@ void Population::setBestIndividual()
 
 void Population::naturalSelection()
 {
-  //TODO
+  speciate();//seperate the population into species 
+  calculateFitness();//calculate the fitness of each player
+  sortSpecies();//sort the species to be ranked in fitness order, best first
+  
+  cullSpecies();//kill off the bottom half of each species
+  setBestIndividual();//save the best player of this gen
+  killStaleSpecies();//remove species which haven't improved in the last 15(ish) generations
+  // killBadSpecies();//kill species which are so bad that they cant reproduce <-- from code bullet template but not used yet
+
+  std::cout << "generation: " << m_generation << ", species: " << m_species.size() << "<<<<<<<<<<<<<<<<<<<<\n";
+
+  const double avgSum = getAvgFitnessSum();
+  const size_t popSize = m_individuals.size();
+  std::vector<std::shared_ptr<Individual>> childs; // la futur génération
+  childs.reserve(m_individuals.size());
+  size_t species_individuals_count;
+
+  std::cout << "species:\n";
+  for(const auto s : m_species)
+  {
+    std::cout << "\tbest unajusted fitness : " << s.getBestFitness() << "\n";
+    
+    species_individuals_count = 0;
+    for(const std::weak_ptr<Individual> weak_ind : s.get_individuals())
+    {
+      const auto shared_ind = weak_ind.lock();
+      std::cout << "\t\tplayer: " <<  species_individuals_count++ << " fitness: " <<  shared_ind->get_fitness() << " score: "  << shared_ind->getScore() << "\n";
+    }
+    std::cout << "\n";
+    
+    // on récupère l'élite de chaque espèce
+    int numOfElite = 0;
+    for(const auto weak_elite : s.getElite())
+    {
+      childs.push_back(weak_elite.lock());
+      ++numOfElite;
+    }
+
+    int NoOfChildren = std::floor(s.getAvgFitness() / avgSum * popSize) - numOfElite;//the number of children this species is allowed, note : we remove the number of elite already added
+    for (int i = 0; i< NoOfChildren; i++) {//get the calculated amount of children from this species
+      childs.push_back(std::make_shared<Individual>(s.reproduce()));
+    }
+  }
+
+  while (childs.size() < popSize) {//if not enough babies (due to flooring the number of children to get a whole int) 
+    childs.push_back(std::make_shared<Individual>(m_species.front().reproduce()));
+  }
+
+  m_individuals.clear();
+  m_individuals = std::move(childs);  
+  ++m_generation;
+  
+  for (auto shared_ind : m_individuals) {//generate networks for each of the children
+    shared_ind->generateNetwork();
+  } 
 }
 
 

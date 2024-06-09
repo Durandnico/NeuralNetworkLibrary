@@ -39,6 +39,7 @@ namespace NeuralNetwork
         int individual_id;
         Genome genome;
         GenomeNetwork network;
+        bool isNetworkGenerate = false;
         double fitness;
         double unajusted_fitness;
 
@@ -65,15 +66,19 @@ namespace NeuralNetwork
         Individual copy() const;
         inline void generateNetwork()
         {
+          if(isNetworkGenerate) // si le network a déjà été generé on retourne
+            return;
+
           network = GenomeNetwork::create_from_genome(genome);
+          isNetworkGenerate = true;
         }
         
-        inline double calculateFitness();
-        inline void show() = delete;
-        inline void move();
-        inline void update();
-        inline void look();
-        inline void think();
+        double calculateFitness();
+        void show();
+        void move();
+        void update();
+        void look();
+        void think();
 
 
 

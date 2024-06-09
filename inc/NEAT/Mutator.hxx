@@ -41,6 +41,7 @@ namespace NeuralNetwork::NEAT
       /* data */ 
       mutationConfig_t config;
       std::random_device rd;
+      std::default_random_engine random_engine;
       std::mt19937 gen;
       
       int genome_id = 0;
@@ -73,6 +74,12 @@ namespace NeuralNetwork::NEAT
       {
         /* generate number between 0 and 1*/
         return Mutator::next_bernoulli(p) ? a : b;
+      }
+
+      inline int choose_int_between(const int a, const int b)
+      {
+        std::uniform_int_distribution<int> dist(a,b);
+        return dist(random_engine);
       }
 
       inline int next_genome_id()

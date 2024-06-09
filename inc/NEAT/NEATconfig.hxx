@@ -45,6 +45,7 @@ typedef struct NEATconfig_s
   int num_generations = 100; // le nombre de générations à exécuter
 
   // double mutation_rate = 0.2; // la probabilité de mutation (non utilisé)
+  double population_mutation_ratio = 0.2; // c'est compliqué à expliquer, mais en gros plus c'est grand, plus il y a de mutation 
   double crossover_rate = 0.75; // la probabilité de croisement
   double mutate_power = 1.2; // la puissance de mutation
 

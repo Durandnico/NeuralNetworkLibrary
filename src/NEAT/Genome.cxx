@@ -32,26 +32,17 @@
 
 static std::vector<NeuralNetwork::NEAT::Gene>::iterator choose_random_hidden(NeuralNetwork::NEAT::Genome& genome)
 {
-  std::uniform_int_distribution<int> dist(genome.get_num_outputs(), genome.get_genes().size());
-  std::default_random_engine rng;
-
-  return genome.get_genes().begin() + dist(rng);
+  return genome.get_genes().begin() + genome.get_num_inputs() + genome.get_num_outputs() + (((double) rand() / RAND_MAX) * (genome.get_num_hidden_genes() - 1));
 }
 
 static std::vector<NeuralNetwork::NEAT::Gene>::iterator choose_random_input(NeuralNetwork::NEAT::Genome& genome)
 {
-  std::uniform_int_distribution<int> dist(0, genome.get_num_inputs());
-  std::default_random_engine rng;
-
-  return genome.get_genes().begin() + dist(rng);
+  return genome.get_genes().begin() + (((double) rand() / RAND_MAX) * (genome.get_num_inputs() - 1));
 }
 
 static std::vector<NeuralNetwork::NEAT::Gene>::iterator choose_random_ouput(NeuralNetwork::NEAT::Genome& genome)
 {
-  std::uniform_int_distribution<int> dist(0, genome.get_num_outputs());
-  std::default_random_engine rng;
-
-  return genome.get_genes().begin() + dist(rng) + genome.get_num_inputs();
+  return genome.get_genes().begin() + genome.get_num_inputs() + (((double) rand() / RAND_MAX) *  (genome.get_num_outputs() - 1));
 }
 
 
@@ -150,11 +141,14 @@ Genome& Genome::operator=(const Genome& genome)
 
 
 /* static methods */
-
+#include <iostream>
 void Genome::mutate_add_synapse(Genome& genome)
 {
   const auto& gene_in = choose_random_input_or_hidden(genome);
   const auto& gene_out = choose_random_hidden_or_output(genome);
+
+  if(gene_in == gene_out)
+    return mutate_add_synapse(genome);
 
   const int& id_in = gene_in->get_innovation_id();
   const int& id_out = gene_out->get_innovation_id();
@@ -166,15 +160,16 @@ void Genome::mutate_add_synapse(Genome& genome)
   
   // sinon on le crée
   else
+  {
+  std::cout <<  "id_in : " << id_in << " id_out : " << id_out << std::endl;
     genome.auto_add_synapse(id_in, id_out, Mutator::get_instance()->new_value());
+  }
+  
 }
 
 void Genome::mutate_remove_synapse(Genome& genome)
 {
-  std::uniform_int_distribution<int> dist(0, genome.get_synapses().size() - 1);
-  std::default_random_engine rng;
-
-  genome.get_synapses().erase(genome.get_synapses().begin() + dist(rng));
+  genome.get_synapses().erase(genome.get_synapses().begin() + Mutator::get_instance()->choose_int_between(0, genome.get_synapses().size() - 1));
 }
 
 void Genome::mutate_add_gene(Genome& genome)
@@ -184,17 +179,18 @@ void Genome::mutate_add_gene(Genome& genome)
   if(genome.get_synapses().empty())
     return;
 
-
-  std::uniform_int_distribution<int> dist(0, genome.get_synapses().size() - 1);
-  std::default_random_engine rng;
-
-  Synapse& syn_to_split = genome.get_synapses()[dist(rng)];
+  const int random_index = Mutator::get_instance()->choose_int_between(0, genome.get_synapses().size() - 1);
+  Synapse& syn_to_split = genome.get_synapses()[random_index];
   syn_to_split.set_enabled(false);
 
-  int inno_id = genome.auto_add_gene();
+  const int inno_id = genome.auto_add_gene();
 
-  genome.auto_add_synapse(syn_to_split.get_linkIds().id_in, inno_id, 1);
-  genome.auto_add_synapse(inno_id, syn_to_split.get_linkIds().id_out, syn_to_split.get_weight());
+  /* je ne sais pas pourquoi je dois faire ca sinon c'est explosé avec une valeur random pour idout ????*/
+  const int id_in = syn_to_split.get_linkIds().id_in; 
+  const int id_out = syn_to_split.get_linkIds().id_out;
+
+  genome.auto_add_synapse(id_in, inno_id, 1);
+  genome.auto_add_synapse(inno_id, id_out, syn_to_split.get_weight());
 }
 
 void Genome::mutate_remove_gene(Genome& genome)
@@ -261,7 +257,19 @@ void Genome::mutate()
     mutate_add_synapse(*this);
 }
 
+void Genome::mutateWeightAndBias()
+{
+  auto* mut = Mutator::get_instance();
+  for (Synapse& synapse : synapses)
+  {
+    synapse.set_weight(mut->new_value());
+  }
 
+  for (Gene& gene : genes)
+  {
+    // gene.set_bias(mut->new_value());
+  }
+}
 
 
 

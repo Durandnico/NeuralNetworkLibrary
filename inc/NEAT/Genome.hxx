@@ -42,7 +42,7 @@ namespace NeuralNetwork
         int num_outputs;
         std::vector<Gene> genes;
         std::vector<Synapse> synapses;
-        int innovationNo;
+        int innovationNo = 0;
 
       public:
         Genome(const int genome_id, const int num_inputs, const int num_outputs);
@@ -67,6 +67,7 @@ namespace NeuralNetwork
         int auto_add_synapse(const int id_in, const int id_out, const double weight);
         void add_synapse(const Synapse& synapse);
         void mutate();
+        void mutateWeightAndBias();
 
         /* getters & setters */
         int get_genome_id() const;

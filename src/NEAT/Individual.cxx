@@ -35,7 +35,9 @@ Individual::Individual(const int individual_id, const Genome& genome)
 }
 
 Individual::Individual(const Individual& individual)
-  : individual_id(individual.individual_id), genome(individual.genome), fitness(individual.fitness)
+  : individual_id(individual.individual_id), genome(individual.genome), 
+    network(individual.network), isNetworkGenerate(individual.isNetworkGenerate),
+    fitness(individual.fitness), unajusted_fitness(individual.unajusted_fitness)
 {
 }
 
@@ -120,6 +122,8 @@ Genome Individual::cross_over(const Individual& dominant, const Individual& rece
 double Individual::calculateFitness()
 {
   //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+
+  return 0.;
 }
 
 
