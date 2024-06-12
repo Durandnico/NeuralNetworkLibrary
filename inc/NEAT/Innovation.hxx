@@ -16,7 +16,7 @@
 #ifndef _INNOVATION_H_
 #define _INNOVATION_H_
 
-namespace NEAT {
+namespace NeuralNetwork::NEAT {
 
 	enum innovtype {
 		NEWNODE = 0,
@@ -37,10 +37,6 @@ namespace NEAT {
 	// ------------------------------------------------------------ 
 	class Innovation {
 	private:
-		enum innovtype {
-			NEWNODE = 0,
-			NEWLINK = 1
-		};
 
 		//typedef int innovtype;
 		//const int NEWNODE = 0;
@@ -55,19 +51,14 @@ namespace NEAT {
 		double innovation_num1;  //The number assigned to the innovation
 		double innovation_num2;  // If this is a new node innovation, then there are 2 innovations (links) added for the new node 
 
-		double new_weight;   //  If a link is added, this is its weight 
-
 		int newnode_id;  // If a new node was created, this is its node_id 
 
-		double old_innov_num;  // If a new node was created, this is the innovnum of the gene's link it is being stuck inside 
-
 		//Constructor for the new node case
-		Innovation(int nin,int nout,double num1,double num2,int newid,double oldinnov);
+		Innovation(int nin,int nout,double num1,double num2,int newid);
 
 		//Constructor for new link case
-		Innovation(int nin,int nout,double num1,double w);
-
-	};
+		Innovation(int nin,int nout,double num1);
+  };
 
 } // namespace NEAT
 

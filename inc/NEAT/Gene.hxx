@@ -25,6 +25,7 @@
 
 // Inclusion des entetes de librairies
 #include "Activation.hxx"
+#include "Innovation.hxx"
 #include <ostream>
 
 namespace NeuralNetwork 
@@ -45,6 +46,7 @@ namespace NeuralNetwork
         Gene(int innovation, double bias);
         Gene(int innovation);
         Gene(const Gene& gene);
+        Gene(const Innovation& inn);
         ~Gene() = default;
 
 

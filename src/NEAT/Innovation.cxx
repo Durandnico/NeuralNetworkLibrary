@@ -15,27 +15,23 @@
 */
 #include "Innovation.hxx"
 
-using namespace NEAT;
+using namespace NeuralNetwork::NEAT;
 
-Innovation::Innovation(int nin,int nout,double num1,double num2,int newid,double oldinnov) {
+Innovation::Innovation(int nin,int nout,double num1,double num2,int newid) {
 	innovation_type=NEWNODE;
 	node_in_id=nin;
 	node_out_id=nout;
 	innovation_num1=num1;
 	innovation_num2=num2;
 	newnode_id=newid;
-	old_innov_num=oldinnov;
 
-	//Unused parameters set to zero
-	new_weight=0;
 }
 
-Innovation::Innovation(int nin,int nout,double num1,double w) {
+Innovation::Innovation(int nin,int nout,double num1) {
 	innovation_type=NEWLINK;
 	node_in_id=nin;
 	node_out_id=nout;
 	innovation_num1=num1;
-	new_weight=w;
 
 	//Unused parameters set to zero
 	innovation_num2=0;

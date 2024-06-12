@@ -24,6 +24,7 @@
 // Inclusion des entetes de librairies
 #include "Gene.hxx"
 #include "Mutator.hxx"
+#include "Innovation.hxx"
 #include <ostream>
 #include <random>
 
@@ -51,6 +52,11 @@ Gene::Gene(const Gene& gene)
 {
 }
 
+
+Gene::Gene(const Innovation& inn)
+  : innovation_id(inn.newnode_id), bias(0.0)
+{
+}
 
 /* operator */
 

@@ -24,6 +24,7 @@
 // Inclusion des entetes de librairies
 #include "Synapse.hxx"
 #include "Mutator.hxx"
+#include "Innovation.hxx"
 #include <random>
 #include <ostream>
 #include <cassert>
@@ -61,6 +62,11 @@ Synapse::Synapse(int innovation_id, int id_in, int id_out)
 
 Synapse::Synapse(const Synapse& synapse)
   : innovationNo(synapse.get_innovation_id()), linkIds(synapse.get_linkIds()), weight(synapse.get_weight()), enabled(synapse.get_enabled())
+{
+}
+
+Synapse::Synapse(const Innovation& inn, double _weight)
+  : innovationNo(inn.innovation_num1), linkIds({inn.node_in_id, inn.node_out_id}), weight(_weight), enabled(true)
 {
 }
 

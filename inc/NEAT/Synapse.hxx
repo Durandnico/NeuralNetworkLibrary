@@ -25,6 +25,7 @@
 
 // Inclusion des entetes de librairies
 #include <ostream>
+#include "Innovation.hxx"
 
 namespace NeuralNetwork 
 {
@@ -56,6 +57,7 @@ namespace NeuralNetwork
         Synapse(int innovationNo, linkIds_t linkIds);
         Synapse(int innovationNo, int id_in, int id_out);
         Synapse(const Synapse& synapse);
+        Synapse(const Innovation& inn, double _weight);
         ~Synapse() = default;
 
         /*  =======================  operator ========================= */
