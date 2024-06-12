@@ -25,6 +25,8 @@
 #include "Genome.hxx"
 #include "Mutator.hxx"
 #include "NEATconfig.hxx"
+#include "Innovation.hxx"
+#include <iostream>
 #include <cassert>
 
 
@@ -104,18 +106,23 @@ Genome::Genome(const int genome_id, const int num_inputs, const int num_outputs)
     }
   }
 
-  innovationNo = id;
+  // if it's the firs
+  if(!nextInnoId)
+  {
+    nextInnoId = id;
+    nextNodeId = num_outputs;
+  } 
+  
 }
 
 Genome::Genome(const Genome& genome)
-  : genome_id(genome.get_genome_id()), num_inputs(genome.get_num_inputs()), num_outputs(genome.get_num_outputs()), genes(genome.get_genes()), synapses(genome.get_synapses()), innovationNo(genome.get_innovationNo())
+  : genome_id(genome.get_genome_id()), num_inputs(genome.get_num_inputs()), num_outputs(genome.get_num_outputs()), genes(genome.get_genes()), synapses(genome.get_synapses())
 {
 }
 
 Genome::Genome(const int genome_id, const int num_inputs, const int num_outputs, const std::vector<Gene>& genes, const std::vector<Synapse>& synapses)
   : genome_id(genome_id), num_inputs(num_inputs), num_outputs(num_outputs), genes(genes), synapses(synapses)
 {
-  innovationNo = genes.size() + synapses.size();
 }
 
 /* operator */
@@ -128,7 +135,6 @@ Genome& Genome::operator=(const Genome& genome)
   num_outputs = genome.get_num_outputs();
   genes = genome.get_genes();
   synapses = genome.get_synapses();
-  innovationNo = genome.get_innovationNo();
   return *this;
 }
 
@@ -141,19 +147,18 @@ Genome& Genome::operator=(const Genome& genome)
 
 
 /* static methods */
-#include <iostream>
-void Genome::mutate_add_synapse(Genome& genome)
+void Genome::mutate_add_synapse(std::vector<Innovation>& innovations, Genome& genome)
 {
   const auto& gene_in = choose_random_input_or_hidden(genome);
   const auto& gene_out = choose_random_hidden_or_output(genome);
 
   if(gene_in == gene_out)
-    return mutate_add_synapse(genome);
+    return mutate_add_synapse(innovations, genome);
 
   const int& id_in = gene_in->get_innovation_id();
   const int& id_out = gene_out->get_innovation_id();
   // on regarde si le lien existe deja
-  const auto opt_link = std::find_if(genome.get_synapses().begin(), genome.get_synapses().end(), [id_in, id_out](const Synapse& synapse){return synapse.linked_to(id_in, id_out);});
+  const auto opt_link = std::find_if(genome.get_synapses().begin(), genome.get_synapses().end(), [&id_in, &id_out](const Synapse& synapse){return synapse.linked_to(id_in, id_out);});
   // au moins on le réacrive
   if(opt_link != genome.get_synapses().end())
     opt_link->set_enabled(true);
@@ -161,8 +166,9 @@ void Genome::mutate_add_synapse(Genome& genome)
   // sinon on le crée
   else
   {
+    const Innovation& innSyn = genome.getInnovationNo(innovations, id_in, id_out);
   std::cout <<  "id_in : " << id_in << " id_out : " << id_out << std::endl;
-    genome.auto_add_synapse(id_in, id_out, Mutator::get_instance()->new_value());
+    genome.add_synapse(innSyn, Mutator::get_instance()->new_value());
   }
   
 }
@@ -172,7 +178,7 @@ void Genome::mutate_remove_synapse(Genome& genome)
   genome.get_synapses().erase(genome.get_synapses().begin() + Mutator::get_instance()->choose_int_between(0, genome.get_synapses().size() - 1));
 }
 
-void Genome::mutate_add_gene(Genome& genome)
+void Genome::mutate_add_gene(std::vector<Innovation>& innovations, Genome& genome)
 {
   // on ajout des genes en séparant des synapeses
   // ie : pas de synapse pas d'ajout
@@ -183,14 +189,16 @@ void Genome::mutate_add_gene(Genome& genome)
   Synapse& syn_to_split = genome.get_synapses()[random_index];
   syn_to_split.set_enabled(false);
 
-  const int inno_id = genome.auto_add_gene();
+  const Innovation& innGene = genome.getNodeId(innovations, syn_to_split);
+  genome.add_gene(innGene);
 
   /* je ne sais pas pourquoi je dois faire ca sinon c'est explosé avec une valeur random pour idout ????*/
-  const int id_in = syn_to_split.get_linkIds().id_in; 
-  const int id_out = syn_to_split.get_linkIds().id_out;
+  const Innovation& innSynIn = genome.getInnovationNo(innovations, syn_to_split.get_linkIds().id_in, innGene.newnode_id);
+  const Innovation& innSynOut = genome.getInnovationNo(innovations, innGene.newnode_id, syn_to_split.get_linkIds().id_out);
 
-  genome.auto_add_synapse(id_in, inno_id, 1);
-  genome.auto_add_synapse(inno_id, id_out, syn_to_split.get_weight());
+
+  genome.add_synapse(innSynIn, 1.0);
+  genome.add_synapse(innSynOut, Mutator::get_instance()->new_value());
 }
 
 void Genome::mutate_remove_gene(Genome& genome)
@@ -205,7 +213,7 @@ void Genome::mutate_remove_gene(Genome& genome)
   auto& links = genome.get_synapses();
   links.erase(
     std::remove_if(links.begin(), links.end(),
-                    [hidden_it](const Synapse& s) {
+                    [&hidden_it](const Synapse& s) {
                       return s.linked_to(hidden_it->get_innovation_id());
                     }
                   ),
@@ -224,12 +232,6 @@ void Genome::mutate_remove_gene(Genome& genome)
 
 /* methods */
 
-int Genome::auto_add_gene()
-{
-  genes.emplace_back(innovationNo++);
-  return innovationNo - 1;
-}
-
 void Genome::add_gene(const Gene& gene)
 {
   const auto& gene_opt = find_gene_by_id(gene.get_innovation_id());
@@ -237,24 +239,29 @@ void Genome::add_gene(const Gene& gene)
   genes.emplace_back(gene);
 }
 
-int Genome::auto_add_synapse(const int id_in, const int id_out, const double weight)
+void Genome::add_gene(const Innovation& inn)
 {
-  synapses.emplace_back(innovationNo++, linkIds_t{id_in, id_out}, weight, true);
-  return innovationNo - 1;
+  genes.emplace_back(inn);
 }
+
 
 void Genome::add_synapse(const Synapse& synapse)
 {
   synapses.emplace_back(synapse);
 }
 
-void Genome::mutate()
+void Genome::add_synapse(const Innovation& inn, double weight)
+{
+  synapses.emplace_back(Synapse(inn, weight));
+}
+
+void Genome::mutate(std::vector<Innovation>& innovations)
 {
   if(Mutator::next_bernoulli(NeatGlobalconfig.node_add_rate)) // on ajoute un gène
-    mutate_add_gene(*this);
+    mutate_add_gene(innovations, *this);
 
   if(Mutator::next_bernoulli(NeatGlobalconfig.conn_add_prob)) // on ajoute une synapse
-    mutate_add_synapse(*this);
+    mutate_add_synapse(innovations, *this);
 }
 
 void Genome::mutateWeightAndBias()
@@ -351,33 +358,108 @@ size_t Genome::get_num_hidden_genes() const
 
 std::vector<Gene>::iterator Genome::find_gene_by_id(const int innovation_id)
 {
-  return std::find_if(genes.begin(), genes.end(), [innovation_id](const Gene& gene){return gene.get_innovation_id() == innovation_id;});
+  return std::find_if(genes.begin(), genes.end(), [&innovation_id](const Gene& gene){return gene.get_innovation_id() == innovation_id;});
 }
 
 std::vector<Gene>::const_iterator Genome::find_gene_by_id(const int innovation_id) const
 {
-  return std::find_if(genes.begin(), genes.end(), [innovation_id](const Gene& gene){return gene.get_innovation_id() == innovation_id;});
+  return std::find_if(genes.begin(), genes.end(), [&innovation_id](const Gene& gene){return gene.get_innovation_id() == innovation_id;});
 }
 
 std::vector<Synapse>::iterator Genome::find_synapse_by_id(linkIds_t link_id)
 {
-  return std::find_if(synapses.begin(), synapses.end(), [link_id](const Synapse& synapse){return synapse.get_linkIds() == link_id;});
+  return std::find_if(synapses.begin(), synapses.end(), [&link_id](const Synapse& synapse){return synapse.get_linkIds() == link_id;});
 }
 
 std::vector<Synapse>::const_iterator Genome::find_synapse_by_id(const linkIds_t link_id) const
 {
-  return std::find_if(synapses.begin(), synapses.end(), [link_id](const Synapse& synapse){return synapse.get_linkIds() == link_id;});
+  return std::find_if(synapses.begin(), synapses.end(), [&link_id](const Synapse& synapse){return synapse.get_linkIds() == link_id;});
 }
 
 
-int Genome::get_innovationNo() const
+
+
+/* local static method */
+#include "Innovation.hxx"
+const Innovation& Genome::getNodeId(std::vector<Innovation>& innovations, Synapse& synToSplit)
 {
-  return innovationNo;
+  // on cherche parmis les innovations pour voir si elle existe déja
+  std::vector<Innovation>::iterator inn_it;
+  bool found;
+
+  inn_it = innovations.begin();
+  do
+  {
+    // on cherche la 1ère innovation qui correspond au critère
+    inn_it = std::find_if(inn_it, innovations.end(), [&synToSplit](const Innovation& inn){
+      return inn.innovation_type == innovtype::NEWNODE
+              && inn.node_in_id == synToSplit.get_linkIds().id_in
+              && inn.node_out_id == synToSplit.get_linkIds().id_out;
+    });
+
+    if(inn_it == innovations.end())
+    {
+      innovations.emplace_back(Innovation(synToSplit.get_linkIds().id_in, synToSplit.get_linkIds().id_out, nextInnoId, nextInnoId + 1, nextNodeId++));
+      return innovations.back(); //retourne nouveau id pour le gène
+    }
+
+    found = true;
+    for(const Gene& gene : this->genes)
+    {
+      if(gene.get_innovation_id() == inn_it->newnode_id)
+      {
+        found = false;
+        inn_it++;
+        break;
+      }
+    }
+
+
+  } while (!found);
+
+  // on a trouvé une correspondance
+
+  return *inn_it;
 }
 
-void Genome::set_innovationNo(const int innNo)
+const Innovation& Genome::getInnovationNo(std::vector<Innovation>& innovations, int nodeIn, int nodeOut)
 {
-  innovationNo = innNo;
+  // on cherche parmis les innovations pour voir si elle existe déja
+  std::vector<Innovation>::iterator inn_it;
+  bool found;
+
+  inn_it = innovations.begin();
+  do
+  {
+    // on cherche la 1ère innovation qui correspond au critère
+    inn_it = std::find_if(inn_it, innovations.end(), [&nodeIn, &nodeOut](const Innovation& inn){
+      return inn.innovation_type == innovtype::NEWLINK
+              && inn.node_in_id == nodeIn
+              && inn.node_out_id == nodeOut;
+    });
+
+    if(inn_it == innovations.end())
+    {
+      innovations.emplace_back(Innovation(nodeIn, nodeOut, nextInnoId++));
+      return innovations.back(); //retourne nouveau id pour le gène
+    }
+
+    found = true;
+    for(const Synapse& syn : this->synapses)
+    {
+      if(syn.get_innovation_id() == inn_it->innovation_num1)
+      {
+        found = false;
+        inn_it++;
+        break;
+      }
+    }
+
+  } while (!found);
+
+  // on a trouvé une correspondance
+
+  return *inn_it;
 }
 // End of NeuralNetwork/NEAT/Genome.cxx
 

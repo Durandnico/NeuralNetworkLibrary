@@ -35,29 +35,33 @@
 
 namespace NeuralNetwork::NEAT
 {
-
 Population::Population(int size, int num_inputs, int num_outputs)
 {
   m_individuals.reserve(size);
   Genome firstone{0, num_inputs, num_outputs};
-  Genome& last_brain = firstone;
+  // Genome& last_brain = firstone;
 
   for (int i = 0; i < size; i++)
   {
-    Genome brain{last_brain}; // copy afin de garder la topologie 
+    Genome brain{firstone}; // copy afin de garder la topologie 
     brain.set_genome_id(i);
 
     const int numMutation = i * NeatGlobalconfig.population_mutation_ratio; 
 
     for (int j = 0; j < numMutation; ++j)
-      brain.mutate();
+      brain.mutate(m_innovations);
 
     brain.mutateWeightAndBias();
-    last_brain = brain; 
+    // last_brain = brain; 
     m_individuals.push_back(std::make_shared<Individual>(std::move(Individual{i, std::move(brain)})));;
   }
 } 
 
+Population::Population(const Genome& initialBrain, size_t size)
+{
+  m_individuals.reserve(size);
+
+}
 
 void Population::updateAlive()
 {
@@ -116,12 +120,12 @@ void Population::naturalSelection()
   size_t species_individuals_count;
 
   std::cout << "species:\n";
-  for(const auto s : m_species)
+  for(const auto& s : m_species)
   {
     std::cout << "\tbest unajusted fitness : " << s.getBestFitness() << "\n";
     
     species_individuals_count = 0;
-    for(const std::weak_ptr<Individual> weak_ind : s.get_individuals())
+    for(const std::weak_ptr<Individual>& weak_ind : s.get_individuals())
     {
       const auto shared_ind = weak_ind.lock();
       std::cout << "\t\tplayer: " <<  species_individuals_count++ << " fitness: " <<  shared_ind->get_fitness() << " score: "  << shared_ind->getScore() << "\n";
@@ -130,7 +134,7 @@ void Population::naturalSelection()
     
     // on récupère l'élite de chaque espèce
     int numOfElite = 0;
-    for(const auto weak_elite : s.getElite())
+    for(const auto& weak_elite : s.getElite())
     {
       childs.push_back(weak_elite.lock());
       ++numOfElite;
