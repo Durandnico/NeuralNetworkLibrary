@@ -53,9 +53,9 @@ namespace NeuralNetwork::NEAT
     const double largeGenomeNormalizer = std::max((int) genome.get_genes().size() - 20 , 1);
     
     
-    const double compatibility = (NeatGlobalconfig.excess_coefficient * excess_disjoint / largeGenomeNormalizer) + (NeatGlobalconfig.weight_coefficient * avg_weight_diff);
+    const double compatibility = (excess_coefficient * excess_disjoint / largeGenomeNormalizer) + (weight_coefficient * avg_weight_diff);
 
-    return compatibility < NeatGlobalconfig.compatibility_threshold;
+    return compatibility < compatibility_threshold;
   }
 
   void Species::addToSpecies(const std::shared_ptr<Individual>& individual)
@@ -184,7 +184,7 @@ namespace NeuralNetwork::NEAT
   Individual Species::reproduce() const
   {
     // on a une chance d'avoir un individu identique
-    if(!Mutator::get_instance()->next_bernoulli(NeatGlobalconfig.crossover_rate))
+    if(!Mutator::get_instance()->next_bernoulli(crossover_rate))
     {
       return selectIndiv()->copy();
     }
@@ -206,7 +206,7 @@ namespace NeuralNetwork::NEAT
   void Species::cull()
   {
     // on supprime les individus les moins performants en fonction du taux de survie
-    const size_t numToSurvive =  std::ceil(m_individuals.size() * NeatGlobalconfig.survival_rate); // nombre d'individus à conserver
+    const size_t numToSurvive =  std::ceil(m_individuals.size() * survival_rate); // nombre d'individus à conserver
     m_individuals.erase(m_individuals.begin() + numToSurvive, m_individuals.end()); // on supprime les autres
   }
 
@@ -234,7 +234,7 @@ namespace NeuralNetwork::NEAT
 
   const std::vector<std::weak_ptr<Individual>> Species::getElite() const
   {
-    const size_t numberOfElite = std::max(NeatGlobalconfig.elistism_min_species, (int) std::floor(NeatGlobalconfig.elitism_rate * m_individuals.size()));
+    const size_t numberOfElite = std::max(elistism_min_species, (int) std::floor(elitism_rate * m_individuals.size()));
     const auto lastElit = m_individuals.begin() + numberOfElite;
     
     return std::vector<std::weak_ptr<Individual>>{m_individuals.begin(), lastElit};

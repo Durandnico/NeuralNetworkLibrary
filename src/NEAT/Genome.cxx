@@ -257,10 +257,10 @@ void Genome::add_synapse(const Innovation& inn, double weight)
 
 void Genome::mutate(std::vector<Innovation>& innovations)
 {
-  if(Mutator::next_bernoulli(NeatGlobalconfig.node_add_rate)) // on ajoute un gène
+  if(Mutator::next_bernoulli(node_add_rate)) // on ajoute un gène
     mutate_add_gene(innovations, *this);
 
-  if(Mutator::next_bernoulli(NeatGlobalconfig.conn_add_prob)) // on ajoute une synapse
+  if(Mutator::next_bernoulli(conn_add_prob)) // on ajoute une synapse
     mutate_add_synapse(innovations, *this);
 }
 

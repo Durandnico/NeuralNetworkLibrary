@@ -64,7 +64,7 @@ Genome Individual::cross_over(const Individual& dominant, const Individual& rece
     const int gene_id = dominant_gene.get_innovation_id();
 
     // est-ce qu'une mutation remplace le gène
-    if(Mutator::next_bernoulli(NeatGlobalconfig.bias_replace_rate))
+    if(Mutator::next_bernoulli(bias_replace_rate))
     {
       offspring.add_gene({gene_id, Mutator::get_instance()->new_value()});
       continue;
@@ -78,7 +78,7 @@ Genome Individual::cross_over(const Individual& dominant, const Individual& rece
       to_add = Gene::cross_over_gene(dominant_gene, *recessive_gene);
     
     //possible mutation
-    if(Mutator::next_bernoulli(NeatGlobalconfig.bias_mutate_rate))
+    if(Mutator::next_bernoulli(bias_mutate_rate))
       to_add.mutateBias();
 
     offspring.add_gene(to_add);
@@ -91,7 +91,7 @@ Genome Individual::cross_over(const Individual& dominant, const Individual& rece
     const linkIds_t link_id = dominant_synapse.get_linkIds();
 
     // est-ce qu'une mutation remplace entièrement la synapse
-    if(Mutator::next_bernoulli(NeatGlobalconfig.weight_replace_rate))
+    if(Mutator::next_bernoulli(weight_replace_rate))
     {
       offspring.add_synapse({dominant_synapse.get_innovation_id(), link_id, Mutator::get_instance()->new_value(), Mutator::next_bernoulli(0.5)});
       continue;
@@ -105,10 +105,10 @@ Genome Individual::cross_over(const Individual& dominant, const Individual& rece
       to_add = Synapse::cross_over_synapse(dominant_synapse, *recessive_synapse);
   
     // possible mutation
-    if(Mutator::next_bernoulli(NeatGlobalconfig.weight_mutate_rate))
+    if(Mutator::next_bernoulli(weight_mutate_rate))
       to_add.mutateWeight();
 
-    if(Mutator::next_bernoulli(NeatGlobalconfig.enable_mutate_rate))
+    if(Mutator::next_bernoulli(enable_mutate_rate))
       to_add.set_enabled(true);
 
     offspring.add_synapse(to_add);

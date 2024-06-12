@@ -46,7 +46,7 @@ Population::Population(int size, int num_inputs, int num_outputs)
     Genome brain{firstone}; // copy afin de garder la topologie 
     brain.set_genome_id(i);
 
-    const int numMutation = i * NeatGlobalconfig.population_mutation_ratio; 
+    const int numMutation = i * population_mutation_ratio; 
 
     for (int j = 0; j < numMutation; ++j)
       brain.mutate(m_innovations);
@@ -213,10 +213,10 @@ void Population::sortSpecies()
 void Population::killStaleSpecies()
 {
 
-  m_species.erase(std::remove_if(m_species.begin(), m_species.end(),
+  std::remove_if(m_species.begin(), m_species.end(),
   [](const Species& s){
-    return s.getStaleness() >= NeatGlobalconfig.age_of_death_of_trisomie21;
-  }));
+    return s.getStaleness() >= age_of_death_of_trisomie21;
+  });
 }
 
 double Population::getAvgFitnessSum()
