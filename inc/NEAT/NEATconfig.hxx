@@ -78,6 +78,9 @@ typedef struct NEATconfig_s
 
 namespace NeuralNetwork::NEAT
 {
+  extern unsigned long int nextNodeId;
+  extern unsigned long int nextInnoId;
+
   static NEATconfig_t NeatGlobalconfig;
 
   typedef struct      mutationConfig_s
