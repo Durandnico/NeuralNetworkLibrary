@@ -260,4 +260,9 @@ namespace NeuralNetwork::NEAT
     return m_individuals;
   }  
 
+  const Genome& Species::get_representative() const
+  {
+    return representative;
+  }
+
 } // namespace NeuralNetwork::NEAT

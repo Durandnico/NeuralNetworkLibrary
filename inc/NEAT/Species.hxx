@@ -74,5 +74,6 @@ namespace NeuralNetwork::NEAT
       double getStaleness() const;
       // int get_species_id() const;
       const std::vector<std::weak_ptr<Individual>>& get_individuals() const;
+      const Genome& get_representative() const;
   };
 }
