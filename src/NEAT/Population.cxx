@@ -53,13 +53,27 @@ Population::Population(int size, int num_inputs, int num_outputs)
 
     brain.mutateWeightAndBias();
     // last_brain = brain; 
-    m_individuals.push_back(std::make_shared<Individual>(std::move(Individual{i, std::move(brain)})));;
+    m_individuals.push_back(std::make_shared<Individual>(Individual{i, std::move(brain)}));
   }
 } 
 
 Population::Population(const Genome& initialBrain, size_t size)
 {
   m_individuals.reserve(size);
+
+  for (size_t i = 0; i < size; i++)
+  {
+    Genome brain{initialBrain}; // copy afin de garder la topologie 
+    brain.set_genome_id(i);
+
+    const int numMutation = i * population_mutation_ratio; 
+
+    for (int j = 0; j < numMutation; ++j)
+      brain.mutate(m_innovations);
+
+    brain.mutateWeightAndBias();
+    m_individuals.push_back(std::make_shared<Individual>(Individual{i, std::move(brain)}));
+  }
 
 }
 
